@@ -35,7 +35,8 @@ class PORTAL_PT_main_panel(bpy.types.Panel):
         #     print("Panel Error:logo" + "\n")
         #     print(e)
 
-        addon_updater_ops.check_for_update_background(ctx)
+        # addon_updater_ops.check_for_update_background(ctx)
+        addon_updater_ops.check_for_update_background()
 
         row_login = layout.row()
         # if not ctx.scene.is_login:
