@@ -1,0 +1,48 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: "" # ${{ github.ref }}
+        release_name: "" #  Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+    - name: Zip Release
+      run: |
+        # 获取标签名称
+        TAG_NAME=${GITHUB_REF#refs/tags/}
+        # 创建一个临时目录来存放打包的文件
+        TEMP_DIR=$(mktemp -d)
+        # 将代码打包到临时目录中，并指定根目录名称为你想要的名称
+        git archive --format=zip --output="$TEMP_DIR/telepass.zip" HEAD
+        # 将打包的 zip 文件移动到仓库的根目录
+        mv "$TEMP_DIR/telepass.zip" .
+        # 清理临时目录
+        rm -rf "$TEMP_DIR"
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./telepass.zip
+        asset_name: telepass.zip
+        asset_content_type: application/zip
