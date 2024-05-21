@@ -31,7 +31,7 @@ jobs:
         # 创建一个临时目录来存放打包的文件
         TEMP_DIR=$(mktemp -d)
         # 将代码打包到临时目录中，并指定根目录名称为你想要的名称
-        git archive --format=zip --output="$TEMP_DIR/telepass.zip" HEAD
+        git archive --format=zip --output="$TEMP_DIR/telepass.zip" --prefix="telepass/"  HEAD
         # 将打包的 zip 文件移动到仓库的根目录
         mv "$TEMP_DIR/telepass.zip" .
         # 清理临时目录
