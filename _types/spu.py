@@ -26,9 +26,9 @@ class VP_SPU(object):
 class VP_PG_SPU(PropertyGroup):
     id : IntProperty
     brand : StringProperty
-    source_codes : CollectionProperty(type=bpy.types.Text)
-    category : CollectionProperty(type=bpy.types.Text)
-    subclass : CollectionProperty(type=bpy.types.Text)
+    source_codes : CollectionProperty(type=bpy.types.Text) # type: ignore
+    category : CollectionProperty(type=bpy.types.Text) # type: ignore
+    subclass : CollectionProperty(type=bpy.types.Text) # type: ignore
     add_date : StringProperty
     pub_date : StringProperty
     is_delete : BoolProperty

@@ -26,21 +26,21 @@ class PORTAL_SKU_SPU(object):
     specs = []
 
 class PORTAL_PG_SKU_SPU(PropertyGroup):
-    id : IntProperty()
-    spu : CollectionProperty(type=spu.VP_PG_SPU)    
-    add_date : StringProperty()
-    pub_date : StringProperty()
-    is_delete : BoolProperty()
-    img : StringProperty()
-    price : StringProperty()
-    cost_price : StringProperty()
-    discount_price : StringProperty()
-    stock : IntProperty()
-    sales : IntProperty()
-    code : StringProperty()
-    volume : StringProperty()
-    weight : StringProperty()
-    specs : CollectionProperty(type=bpy.types.Text)
+    id : IntProperty()  # type: ignore
+    spu : CollectionProperty(type=spu.VP_PG_SPU)   # type: ignore 
+    add_date : StringProperty() # type: ignore
+    pub_date : StringProperty() # type: ignore
+    is_delete : BoolProperty() # type: ignore
+    img : StringProperty() # type: ignore
+    price : StringProperty() # type: ignore
+    cost_price : StringProperty() # type: ignore
+    discount_price : StringProperty() # type: ignore
+    stock : IntProperty() # type: ignore
+    sales : IntProperty() # type: ignore
+    code : StringProperty() # type: ignore
+    volume : StringProperty() # type: ignore
+    weight : StringProperty() # type: ignore
+    specs : CollectionProperty(type=bpy.types.Text) # type: ignore
     
 
 
