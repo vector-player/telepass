@@ -59,26 +59,33 @@ class PORTAL_OT_login(bpy.types.Operator):
         
         try: 
             url = ctx.preferences.addons[addon_name].preferences.portal_ip
-            api_user_sku_spus = self.csrf_login(ctx, url)
+            res = self.csrf_login(ctx, url)
+            if res.status_code == 200:
+                print("Connect successfully.")
+                api_user_sku_spus = json.loads(res.text)
+                print("response from api_user_sku_spus:", api_user_sku_spus)
+                if api_user_sku_spus == False:
+                    msg = 'Login Failed. Check Username and Password.'
+                    print(msg)
+                    self.report({'INFO'}, msg)
+                    ## put an empty list to clear UI Previews
+                    SKU_SPU_Serializer([])
+                    load_previews_user_sku(self,ctx)
+                    return {"FINISHED"}
+                if not api_user_sku_spus:
+                    msg = 'Response is None.'
+                    print(msg)
+                    self.report({'INFO'}, msg)
+                    return {"FINISHED"}
+
+            api_user_sku_spus = res
         except Exception as e:
             msg = 'Login Failed. Check user connection.'
             print(msg)
             self.report({'INFO'}, msg)
             print(e)
             return {"FINISHED"}
-        if api_user_sku_spus == False:
-            msg = 'Login Failed. Check Username and Password.'
-            print(msg)
-            self.report({'INFO'}, msg)
-            ## put an empty list to clear UI Previews
-            SKU_SPU_Serializer([])
-            load_previews_user_sku(self,ctx)
-            return {"FINISHED"}
-        if not api_user_sku_spus:
-            msg = 'Login Failed. Response is None. Check user connection.'
-            print(msg)
-            self.report({'INFO'}, msg)
-            return {"FINISHED"}
+
         # code_names = self.parse_purchased_codenames(spus)
         # ctx.scene.user_addon_names = self.parse_user_spus(spus, 'title')
         settings.portal_user_addons = SKU_SPU_Serializer(api_user_sku_spus)
@@ -152,6 +159,7 @@ class PORTAL_OT_login(bpy.types.Operator):
         try:
             res = sss.post(url, headers = my_headers, data = my_data)
             print("csrf POST response:+++++++++++++++++++++++++++++++++","\n",res)
+            
             # print(res.data.decode('utf-8'))
             # 1. response.status_code
             # 2. response.text
@@ -160,19 +168,20 @@ class PORTAL_OT_login(bpy.types.Operator):
             # 5. response.apparent_encoding
             # 6. response.headers
         
-            # print('session:',sss)
-            res = json.loads(res.text)
+            # print('session:',sss)            
             # res = json.dumps(res.text)
             # res = json.dumps(res.text.encode('utf-8'))
             # res = res.body
             # res = res.content
             # res.encoding="utf-8"
             # res = res.content.decode('utf-8')
+
+        #     dict = json.loads(res.text)
         except Exception as e:
             print(e)
             print("Can't handle json.loads: \n",res.text)
             return False
-        print("csrf POST response prosess:+++++++++++++++++++++++++++++++++","\n",res)
+        # print("csrf POST response to dict:+++++++++++++++++++++++++++++++++","\n",dict)
         # print('session:',res['session_id'])
         return res
 

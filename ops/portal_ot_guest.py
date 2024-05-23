@@ -59,14 +59,14 @@ class PORTAL_OT_guest(bpy.types.Operator):
             return {"FINISHED"}
 
         if not api_market_sku_spus:
-            msg = 'Login Failed. Response is None. Check market connection.'
+            msg = 'Market response is None. Check market connection.'
             print(msg)
             self.report({'INFO'}, msg)
             return {"FINISHED"}
         # code_names = self.parse_purchased_codenames(spus)
         # ctx.scene.user_addon_names = self.parse_user_spus(spus, 'title')        
         settings.portal_market_addons = SKU_SPU_Serializer(api_market_sku_spus)
-        print("LOGIN INFO:portal_market_addons:",len(settings.portal_market_addons))
+        print("LOGIN INFO:portal_market_addons found:",len(settings.portal_market_addons))
         load_previews_market_sku(ctx.scene.portal_sku_market_previews, ctx)
         return {"FINISHED"}
 

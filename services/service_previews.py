@@ -25,6 +25,13 @@ def has_img(img_name):
 def get_img_path(img_name):
     return os.path.join(img_dir, img_name)
 
+def get_img_name_from_url(img_url):
+    # img_name = os.path.basename(img_url)
+    ## Considering 3rd-party objects storages path with concating signiture arguments,
+    ## which start with '?' and should be removed while retrieving clean file name.
+    img_name = os.path.basename(img_url.split('?')[0]) 
+    return img_name
+
 
 def new_image_texture(name:str, img:bpy.types.Image, ext:str='CLIP'):
     texture = bpy.data.textures.new(name=name, type="IMAGE")
@@ -57,7 +64,7 @@ def download_img(img_url, img_name:str='default'):
     response = requests.get(img_url,headers=headers)
     #获取文件名
     if img_name == 'default':
-        img_name = os.path.basename(img_url)
+        img_name = get_img_name_from_url(img_url)
     # print("Image name:", img_name)
     #创建本地文件并写入图片内容
     img_path = os.path.join(img_dir, img_name)
@@ -101,7 +108,8 @@ def pcoll_from_sku_spus(sku_spus):
 
     for sku_spu in sku_spus:
         img_url = sku_spu.img
-        img_name = os.path.basename(img_url) 
+        # img_name = os.path.basename(img_url) 
+        img_name = get_img_name_from_url(img_url)
 
         ## Download image if not LOCAL      
         # print("读取image url:",img_url)
@@ -139,7 +147,8 @@ def load_image_list(self, ctx):
     for i,img_url in enumerate(image_list):
         # print("image list enum index:",i, "item:", img_url)
 
-        img_name = os.path.basename(img_url)  
+        # img_name = os.path.basename(img_url)  
+        img_name = get_img_name_from_url(img_url)
 
         ## Download image if not LOCAL      
         # print("读取image url:",img_url)
@@ -209,7 +218,8 @@ def load_previews_market_sku(self, ctx):
     for portal_sku_spu in settings.portal_market_addons.values():
         img_url = portal_sku_spu.img
         # img_name = str(portal_sku_spu.id)
-        img_name = os.path.basename(img_url)  
+        # img_name = os.path.basename(img_url)  
+        img_name = get_img_name_from_url(img_url)
 
         ## Download image if not LOCAL      
         # print("读取image url:",img_url)
@@ -244,7 +254,8 @@ def load_previews_user_sku(self, ctx):
     for portal_sku_spu in settings.portal_user_addons.values():
         img_url = portal_sku_spu.img
         # img_name = str(portal_sku_spu.id)
-        img_name = os.path.basename(img_url)  
+        # img_name = os.path.basename(img_url)  
+        img_name = get_img_name_from_url(img_url)
 
         ## Download image if not LOCAL      
         # print("读取image url:",img_url)
