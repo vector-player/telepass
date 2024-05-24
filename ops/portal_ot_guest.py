@@ -67,7 +67,9 @@ class PORTAL_OT_guest(bpy.types.Operator):
         # ctx.scene.user_addon_names = self.parse_user_spus(spus, 'title')        
         settings.portal_market_addons = SKU_SPU_Serializer(api_market_sku_spus)
         print("LOGIN INFO:portal_market_addons found:",len(settings.portal_market_addons))
-        load_previews_market_sku(ctx.scene.portal_sku_market_previews, ctx)
+        # load_previews_market_sku(ctx.scene.portal_sku_market_previews, ctx)
+        ## Cause WARNING
+        # WARN (bpy.rna): C:\Users\blender\git\blender-vdev\blender.git\source\blender\python\intern\bpy_rna.c:1340 pyrna_enum_to_py: current value '0' matches no enum in 'Scene', 'Scene', 'portal_sku_market_previews'
         return {"FINISHED"}
 
 

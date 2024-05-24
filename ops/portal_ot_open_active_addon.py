@@ -21,6 +21,11 @@ class PORTAL_OT_open_active_addon(bpy.types.Operator):
                 self.report({'INFO'}, msg)
                 print(msg)
                 return {"FINISHED"}
+            
+            if settings.portal_market_addons[id].status == 'test':                
+                bpy.ops.portal.call(id=id, ref='init')
+                return {"FINISHED"}
+
             # url = f"http://192.168.1.203:8000/spu/{id}/"
             url = f"{settings.portal_spu}/{id}/"
             webbrowser.open(url)
@@ -34,7 +39,7 @@ class PORTAL_OT_open_active_addon(bpy.types.Operator):
                 print(msg)
                 return {"FINISHED"}
             print(settings.portal_user_addons[id].spu.title)
-            bpy.ops.portal.call(ref='init')
+            bpy.ops.portal.call(id=id, ref='init')
         return {"FINISHED"}
 
 classes = [

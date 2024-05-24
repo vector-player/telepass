@@ -37,17 +37,19 @@ from .ops import (
     portal_show_detail,
 )
 from .services import service_previews
-
+from .services.service_previews import previews
 
 # print("cwd:",os.getcwd())
 
 
 
 
-
 def on_register():
-    pass
-    bpy.ops.portal.init('INVOKE_DEFAULT')
+    ## To get market info automatically
+    try:
+        bpy.ops.portal.init('INVOKE_DEFAULT')
+    except Exception as e:
+        print("Error while try to get market info on register:",e)
     ## this will happen .01 seconds after addon registration completes.
     ## according to the timer in rergister() function.
     # try:
@@ -93,7 +95,10 @@ def register():
     global_props.register()
 
     ## timer for callback after register
-    bpy.app.timers.register(on_register, first_interval=.01)
+    bpy.app.timers.register(on_register, first_interval=1)
+    
+    # previews = bpy.utils.previews.ImagePreviewCollection.new()
+    
 
 
 def unregister():
@@ -113,7 +118,13 @@ def unregister():
     portal_ot_tab.unregister()
     portal_ot_rig.unregister()
     portal_ot_call.unregister()
-    
+    # bpy.utils.previews.remove(previews['global'])
+    # bpy.utils.previews.remove(previews['market_sku'])
+    # bpy.utils.previews.remove(previews['user_sku'])
+    for pcoll in previews:
+        if type(pcoll) is bpy.types.ImagePreview:
+            bpy.utils.previews.remove(pcoll)
+    previews.clear()
 
 
 if __name__ == "__main__":

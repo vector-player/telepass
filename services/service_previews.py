@@ -17,6 +17,9 @@ previews = {}
 previews['global'] = bpy.utils.previews.new()
 previews['market_sku'] = bpy.utils.previews.new()
 previews['user_sku'] = bpy.utils.previews.new()
+previews['load_image_dict'] = bpy.utils.previews.new()
+
+
 
 def has_img(img_name):    
     img_path = os.path.join(img_dir, img_name)
@@ -83,7 +86,9 @@ def pcoll_from_local(img_path):
     # bpy.utils.previews.remove(pcoll)
     # previews['global'] = bpy.utils.previews.new()
 
-    pcoll = previews['global']
+    # pcoll = previews['global']
+    # previews['local'] = bpy.utils.previews.new()
+    pcoll = previews['local']
 
     # img_name = os.path.basename(img_path)
     (img_dir, img_name) = os.path.split(img_path)
@@ -92,6 +97,9 @@ def pcoll_from_local(img_path):
         thumb = pcoll.load(img_name, img_path, 'IMAGE')  
     else:
         thumb = pcoll[img_name]
+    
+    # bpy.utils.previews.remove(pcoll) # try to eliminate WARNING of 'previews left open'
+
     return thumb.icon_id
 
 
@@ -140,6 +148,8 @@ def enum_from_pcoll(pcoll):
 
 
 def load_image_list(self, ctx):
+    # previews['load_image_list'] = bpy.utils.previews.new()
+    pcoll = previews['load_image_list']
 
     enum_items = []
     from .. import settings
@@ -169,22 +179,28 @@ def load_image_list(self, ctx):
     # print("Preview INFO: market enum_items:",len(enum_items))
     bpy.context.view_layer.update()
     bpy.context.area.tag_redraw()
+    # bpy.utils.previews.remove(pcoll) # try to eliminate WARNING of 'previews left open'
     return enum_items
 
 
 def load_image_dict(self, ctx):
-
+    # previews['load_image_dict'] = bpy.utils.previews.new()
+    pcoll = previews['load_image_dict']
     enum_items = []
+    
     from .. import settings
     image_dict = settings.portal_sku_detail_image_dict
+    # if len(image_dict.keys()) == 0: 
+    #     return None
     for i in range(len(image_dict.keys())):
     # for i,img in enumerate(image_dict):
         
+        print("load_image_dict:", i)
         img = image_dict[str(i)]
         img_name = img['name']  
         img_url = img['url'] 
         # print("img_url",img_url)
-        # print("image list enum index:",i, "item:", img_url)
+        # print("image list enum index:",i + 1, "item:", img_url)
         ## Download image if not LOCAL      
         # print("读取image url:",img_url)
         if not has_img(img_name):
@@ -199,18 +215,20 @@ def load_image_dict(self, ctx):
             thumb = pcoll[img_name]
 
         ## Format thumb to Enumerator to feed UI
-        enum_items.append((str(i), img_name, img_url, thumb.icon_id, i))
+        ## Since 'i' is for enum assignment, it should start with '1'(i + 1), not '0',        
+        enum_items.append((str(i + 1), img_name, img_url, thumb.icon_id, i + 1))
 
     # print("Preview INFO: market enum_items:",len(enum_items))
     bpy.context.view_layer.update()
     bpy.context.area.tag_redraw()
+    # bpy.utils.previews.remove(pcoll) # try to eliminate WARNING of 'previews left open'
     return enum_items
 
 
 def load_previews_market_sku(self, ctx):
     ## prepare enumproperty for ui
     enum_items = []
-    global pcoll
+    # global pcoll
     pcoll = previews['market_sku']
     # print("pcoll type:", type(pcoll))
     # for portal_sku_spu in bpy.context.scene.portal_sku_spus:
@@ -240,13 +258,14 @@ def load_previews_market_sku(self, ctx):
     # print("Preview INFO: market enum_items:",len(enum_items))
     # ctx.view_layer.update()
     # ctx.area.tag_redraw()
+    # bpy.utils.previews.remove(pcoll) # try to eliminate WARNING of 'previews left open'
     return enum_items
 
 
 def load_previews_user_sku(self, ctx):
     ## prepare enumproperty for ui
     enum_items = []
-    global pcoll
+    # global pcoll
     pcoll = previews['user_sku']
     # print("pcoll type:", type(pcoll))
     # for portal_sku_spu in bpy.context.scene.portal_sku_spus:
@@ -263,7 +282,7 @@ def load_previews_user_sku(self, ctx):
             download_img(img_url, 'default')
         img_path = get_img_path(img_name)
 
-        ## Create new thumb in not EXIST
+        ## Create new thumb if not EXIST
         icon = pcoll.get(img_name)
         if not icon:
             thumb = pcoll.load(img_name, img_path, 'IMAGE')  
@@ -282,7 +301,16 @@ def load_previews_user_sku(self, ctx):
     # print("Preview INFO: user enum_items:",len(enum_items))
     # bpy.context.view_layer.update()
     # bpy.context.area.tag_redraw()
+    # bpy.utils.previews.remove(pcoll) # try to eliminate WARNING of 'previews left open'
     return enum_items
+
+def update_button(ctx, id):
+    print("seletct id status",settings.portal_market_addons[id].status)
+    sku = settings.portal_market_addons[id]
+    if sku.status == 'test' :   # and 'Addons' in sku.spu.category
+        ctx.scene.portal_active_addon_status = 'On/Off'
+    else:
+        ctx.scene.portal_active_addon_status = 'Subscribe'
 
 
 def update_detail_preview(ctx):
@@ -320,6 +348,7 @@ def update_detail_preview(ctx):
 def on_select_market_preview(self, ctx):
     id = self.portal_sku_market_previews
     ctx.scene.portal_active_market_addon_id = id
+    update_button(ctx,id)
     update_detail_preview(ctx)
     print('selected preview icon:',id)
     print("test serialize:", settings.portal_market_addons[str(id)].spu.title)
@@ -361,7 +390,7 @@ def register():
     ## So that calling 'set=' function within load-items-function might not run collectly.
     bpy.types.Scene.portal_sku_market_previews = EnumProperty( items=load_previews_market_sku, update=on_select_market_preview,  ) 
     bpy.types.Scene.portal_sku_user_previews = EnumProperty( items=load_previews_user_sku, update=on_select_user_preview,  )  ## items=load_previews_sku, set=set_preview,  ## get=get_preview
-    bpy.types.Scene.portal_sku_detail_previews = EnumProperty( items=load_image_dict, update=on_select_detail_preview,  )
+    bpy.types.Scene.portal_sku_detail_previews = EnumProperty( items=load_image_dict, update=on_select_detail_preview, ) 
 
 def unregister():
     del bpy.types.Scene.portal_sku_user_previews

@@ -60,25 +60,35 @@ class PORTAL_OT_login(bpy.types.Operator):
         try: 
             url = ctx.preferences.addons[addon_name].preferences.portal_ip
             res = self.csrf_login(ctx, url)
+            msg = f"Connection status:{res.status_code}"
+            print(msg)
+            self.report({'INFO'}, msg)
+            
             if res.status_code == 200:
-                print("Connect successfully.")
-                api_user_sku_spus = json.loads(res.text)
-                print("response from api_user_sku_spus:", api_user_sku_spus)
-                if api_user_sku_spus == False:
-                    msg = 'Login Failed. Check Username and Password.'
-                    print(msg)
-                    self.report({'INFO'}, msg)
-                    ## put an empty list to clear UI Previews
-                    SKU_SPU_Serializer([])
-                    load_previews_user_sku(self,ctx)
-                    return {"FINISHED"}
-                if not api_user_sku_spus:
-                    msg = 'Response is None.'
-                    print(msg)
-                    self.report({'INFO'}, msg)
-                    return {"FINISHED"}
+                msg = "Connect successfully."
+                print(msg)
+                self.report({'INFO'}, msg)
 
-            api_user_sku_spus = res
+            api_user_sku_spus = json.loads(res.text)
+            msg = f"response from api_user_sku_spus:{api_user_sku_spus}"
+            print(msg)
+            self.report({'INFO'}, msg)
+
+            if api_user_sku_spus == False:
+                msg = 'Login Failed. Check Username and Password.'
+                print(msg)
+                self.report({'INFO'}, msg)
+                ## put an empty list to clear UI Previews
+                SKU_SPU_Serializer([])
+                load_previews_user_sku(self,ctx)
+                return {"FINISHED"}
+            if not api_user_sku_spus:
+                msg = 'Response is None. Go to market and see what you would like.'
+                print(msg)
+                self.report({'INFO'}, msg)
+                return {"FINISHED"}
+
+            
         except Exception as e:
             msg = 'Login Failed. Check user connection.'
             print(msg)

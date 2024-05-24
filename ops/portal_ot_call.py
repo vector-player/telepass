@@ -9,15 +9,16 @@ class PORTAL_OT_call(bpy.types.Operator):
     bl_description = "Call RESTFUL API to exec codes"
     bl_options = {"REGISTER"}
 
-    # id : bpy.props.IntProperty()
-    ref : bpy.props.StringProperty()
+    id : bpy.props.StringProperty() # type: ignore
+    ref : bpy.props.StringProperty() # type: ignore
 
     @classmethod
     def poll(cls, context):
         return True
 
     def execute(self, ctx):
-        id = ctx.scene.portal_active_user_addon_id
+        # id = ctx.scene.portal_active_user_addon_id
+        id = self.id
         if not id:
             msg = 'SPU PK/ID not specified.'
             self.report({'INFO'}, msg)

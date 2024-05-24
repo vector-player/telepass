@@ -10,6 +10,7 @@ from ..services import service_previews,  global_variable
 
 class PORTAL_SKU_SPU(object):
     id : int
+    status : str
     spu = {}
     add_date : str
     pub_date : str
@@ -27,6 +28,7 @@ class PORTAL_SKU_SPU(object):
 
 class PORTAL_PG_SKU_SPU(PropertyGroup):
     id : IntProperty()  # type: ignore
+    status : StringProperty() # type: ignore
     spu : CollectionProperty(type=spu.VP_PG_SPU)   # type: ignore 
     add_date : StringProperty() # type: ignore
     pub_date : StringProperty() # type: ignore
@@ -53,6 +55,7 @@ def SKU_SPU_Serializer(api_sku_spus):
         portal_sku_spu = PORTAL_SKU_SPU()
 
         portal_sku_spu.id = api['id']
+        portal_sku_spu.status = api['status']
         portal_sku_spu.spu = spu.SPUS_Serializer([api['spu'],])[str(api['id'])]
         portal_sku_spu.add_date = api['add_date']
         portal_sku_spu.pub_date = api['pub_date']
