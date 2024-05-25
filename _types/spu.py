@@ -7,7 +7,7 @@ VP_SPUS = {}
 class VP_SPU(object):
     id : str
     brand : str
-    source_codes = []
+    # source_codes = []
     category = []
     subclass = []
     add_date : str
@@ -26,7 +26,7 @@ class VP_SPU(object):
 class VP_PG_SPU(PropertyGroup):
     id : IntProperty
     brand : StringProperty
-    source_codes : CollectionProperty(type=bpy.types.Text) # type: ignore
+    # source_codes : CollectionProperty(type=bpy.types.Text) # type: ignore
     category : CollectionProperty(type=bpy.types.Text) # type: ignore
     subclass : CollectionProperty(type=bpy.types.Text) # type: ignore
     add_date : StringProperty
@@ -50,8 +50,8 @@ def SPUS_Serializer(api_spus):
         vp_spu = VP_SPU()
         vp_spu.id = spu['id']
         vp_spu.brand = spu['brand']
-        for sc in spu['source_codes']:            
-            vp_spu.source_codes.append(sc)
+        # for sc in spu['source_codes']:            
+        #     vp_spu.source_codes.append(sc)
             
         for cg in spu['category']:
             vp_spu.category.append(cg)

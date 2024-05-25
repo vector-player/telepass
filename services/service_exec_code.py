@@ -39,33 +39,57 @@ def get_code_from_db():
 def get_code_by_name(spu_pk, code_name):
     from .. import settings
     
-    try:
-        user_api_root_url = settings.portal_user_source_codes
-        sub_url = f'{spu_pk}/{code_name}.json'
-        user_api = os.path.join(user_api_root_url, sub_url)
-        user_api_res = session_request(user_api)
-        print("serice_exec_code res from user API:",user_api_res)
+    # try:
+    user_api_root_url = settings.portal_user_source_codes
+    sub_url = f'{spu_pk}/{code_name}.json'
+    user_api = os.path.join(user_api_root_url, sub_url)
+    user_api_res = session_request(user_api)
+    print("serice_exec_code res from user API:",user_api_res)
 
-        test_api_root_url = settings.portal_test_source_codes
-        sub_url = f'{spu_pk}/{code_name}.json'
-        test_api = os.path.join(test_api_root_url, sub_url)
-        test_api_res = session_request(test_api)
-        print("serice_exec_code res from test API:",test_api_res)
-        
-        if len(user_api_res) == 0:
-            print('No such content in user API, now try market-test API...')
-            if len(test_api_res) == 0:
-                print("No such content in market-test API.")
-                return None
-            else:
-                dict = test_api_res[0]
-                code = dict['code_content']
-                return code
-        dict = user_api_res[0]
+    test_api_root_url = settings.portal_test_source_codes
+    sub_url = f'{spu_pk}/{code_name}.json'
+    test_api = os.path.join(test_api_root_url, sub_url)
+    test_api_res = session_request(test_api)
+    print("serice_exec_code res from test API:",test_api_res)
+    
+    # if len(user_api_res) == 0:
+    if user_api_res.status_code == 200:
+        dict = json.loads(user_api_res.text)
+    else:
+        print(f'User API error with code:{user_api_res.status_code}, now try market-test API...')
+        if test_api_res.status_code == 200:
+            dict = json.loads(test_api_res.text)
+        else:
+            print(f"Market-test API error with code:{test_api_res.status_code}.")
+            res = {
+                "user_api_code":user_api_res.status_code,
+                "test_api_code":test_api_res.status_code,
+                "has_error": True,
+                "code": None
+            }
+            return res
+   
+    if len(dict) == 0:
+        print("No code to execute.")
+        res = {
+            "user_api_code":user_api_res.status_code,
+            "test_api_code":test_api_res.status_code,
+            "has_error": False,
+            "code": None
+        }
+        return res
+    else:
+        dict = dict[0]
         code = dict['code_content']
-        return code
-    except Exception as e:
-        print("error:", e)
+        res = {
+            "user_api_code":user_api_res.status_code,
+            "test_api_code":test_api_res.status_code,
+            "has_error": False,
+            "code": code
+        }
+        return res
+    # except Exception as e:
+    #     print("error:", e)
 
 
 def session_request(url):    
@@ -89,11 +113,11 @@ def session_request(url):
         # print("Response headers:",res.headers)
         # print(res.body.decode('utf-8'))
 
-        res = json.loads(res.text)
+        # res = json.loads(res.text)
 
     except Exception as e:
         print(e)
-        print("Can't handle json.loads: \n")
+        # print("Can't handle json.loads: \n")
         return False
     print("Response:+++++++++++++++++++++++++++++++++","\n",res)
     # print('session:',res['session_id'])

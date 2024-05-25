@@ -12,6 +12,7 @@ class PORTAL_SKU_SPU(object):
     id : int
     status : str
     spu = {}
+    source_codes = []
     add_date : str
     pub_date : str
     is_delete : bool
@@ -30,6 +31,7 @@ class PORTAL_PG_SKU_SPU(PropertyGroup):
     id : IntProperty()  # type: ignore
     status : StringProperty() # type: ignore
     spu : CollectionProperty(type=spu.VP_PG_SPU)   # type: ignore 
+    source_codes : CollectionProperty(type=bpy.types.Text) # type: ignore
     add_date : StringProperty() # type: ignore
     pub_date : StringProperty() # type: ignore
     is_delete : BoolProperty() # type: ignore
@@ -57,6 +59,10 @@ def SKU_SPU_Serializer(api_sku_spus):
         portal_sku_spu.id = api['id']
         portal_sku_spu.status = api['status']
         portal_sku_spu.spu = spu.SPUS_Serializer([api['spu'],])[str(api['id'])]
+
+        for sc in api['source_codes']:            
+            portal_sku_spu.source_codes.append(sc)
+
         portal_sku_spu.add_date = api['add_date']
         portal_sku_spu.pub_date = api['pub_date']
         portal_sku_spu.is_delete = api['is_delete']
