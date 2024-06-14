@@ -1,12 +1,12 @@
 import bpy
 
-class PORTAL_OT_call(bpy.types.Operator):
+class TELE_OT_exec(bpy.types.Operator):
     """
-    Use Case: bpy.ops.portal.call(ref='init')
+    Use Case: bpy.ops.tele.exec(ref='init')
     """
-    bl_idname = "portal.call"
-    bl_label = "Portal Call"
-    bl_description = "Call RESTFUL API to exec codes"
+    bl_idname = "tele.exec"
+    bl_label = "tele.exec"
+    bl_description = "Execute function of cloud addon"
     bl_options = {"REGISTER"}
 
     # id : bpy.props.StringProperty() # type: ignore
@@ -61,7 +61,7 @@ class PORTAL_OT_call(bpy.types.Operator):
 
 
 classes = [
-    PORTAL_OT_call
+    TELE_OT_exec
 ]
 
 def register():

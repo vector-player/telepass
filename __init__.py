@@ -32,9 +32,9 @@ from .ops import (
     portal_ot_open_active_addon,
     portal_ot_build_rig,
     portal_ot_rig,
-    portal_ot_call,
     portal_ot_tab,
     portal_show_detail,
+    tele_ot_exec,
 )
 from .services import service_previews
 from .services.service_previews import previews
@@ -86,7 +86,7 @@ def register():
     portal_show_detail.register()
     portal_ot_tab.register()
     portal_ot_rig.register()
-    portal_ot_call.register()
+    tele_ot_exec.register()
     # view_opt.register()
     main_panel.register()
     msgbox.register()
@@ -117,7 +117,7 @@ def unregister():
     portal_show_detail.unregister()
     portal_ot_tab.unregister()
     portal_ot_rig.unregister()
-    portal_ot_call.unregister()
+    tele_ot_exec.unregister()
     # bpy.utils.previews.remove(previews['global'])
     # bpy.utils.previews.remove(previews['market_sku'])
     # bpy.utils.previews.remove(previews['user_sku'])

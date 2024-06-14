@@ -59,6 +59,7 @@ def get_code_by_name(spu_pk, code_name):
         print(f'User API error with code:{user_api_res.status_code}, now try market-test API...')
         if test_api_res.status_code == 200:
             dict = json.loads(test_api_res.text)
+            # print(test_api_res.text)
         else:
             print(f"Market-test API error with code:{test_api_res.status_code}.")
             res = {
