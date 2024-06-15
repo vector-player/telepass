@@ -4,6 +4,10 @@ from bpy.types import PropertyGroup
 from bpy.props import CollectionProperty, IntProperty, StringProperty, BoolProperty, EnumProperty
 from . import spu
 from ..services import service_previews,  global_variable
+import logging
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s【%(levelname)s】(%(name)s-No.%(lineno)d):%(funcName)s -> %(message)s")
+logger = logging.getLogger(__name__)
+
 
 # global PORTAL_SKU_SPUS
 # PORTAL_SKU_SPUS = {}
@@ -78,7 +82,8 @@ def SKU_SPU_Serializer(api_sku_spus):
         portal_sku_spu.specs = api['specs']
 
         PORTAL_SKU_SPUS[str(portal_sku_spu.id)] = portal_sku_spu
-        # print("共序列化SKU数量:",len(PORTAL_SKU_SPUS))
+        logger.debug("SKU count:".format(len(PORTAL_SKU_SPUS)))
+        
     return PORTAL_SKU_SPUS
     
 

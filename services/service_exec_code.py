@@ -3,20 +3,24 @@ import urllib
 import urllib3
 import json
 import os
+import logging
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s【%(levelname)s】(%(name)s-No.%(lineno)d):%(funcName)s -> %(message)s")
+logger = logging.getLogger(__name__)
+
 
 
 def urllib_req():
     url = "http://192.168.1.203:8000/shop_plus/ui_test"
     res = urllib.request.urlopen(url)
     code = res.read()
-    print(code)
+    logger.debug("code={}".format(code))
     exec(code)
 
 def urllib3_req():
     url = "http://192.168.1.203:8000/shop_plus/ui_test"
     http = urllib3.PoolManager()
-    response = http.request("GET", url)
-    print("response status:",response.status) # Prints 200
+    response = http.request("GET", url)    
+    logger.debug("response status:{}".format(response.status))
     code = response.data.decode("utf-8")
     print(code)
     exec(code)
@@ -25,13 +29,13 @@ def get_code_from_db():
     url = "http://192.168.1.203:8000/shop_plus/code/1"
     http = urllib3.PoolManager()
     _res = http.request("GET", url)
-    print("response status:",_res.status) # Prints 200
+    logger.debug("response status:{}".format(_res.status))
     _res = _res.data
-    print("res :" + "\n",_res) ## err: can only concatenate str (not 'bytes')
+    logger.debug("res:\n{}".format(_res)) ## err: can only concatenate str (not 'bytes')
 
     _res = _res.decode("utf-8")
     # _res = _res['code']
-    print("res utf8:"+"\n" + _res)        
+    logger.debug("res utf8:\n{}".format(_res))      
     # print(code.json()['data']['cityname']) 
     exec(_res)
 
@@ -39,58 +43,80 @@ def get_code_from_db():
 def get_code_by_name(spu_pk, code_name):
     from .. import settings
     
-    # try:
-    user_api_root_url = settings.portal_user_source_codes
-    sub_url = f'{spu_pk}/{code_name}.json'
-    user_api = os.path.join(user_api_root_url, sub_url)
-    user_api_res = session_request(user_api)
-    print("serice_exec_code res from user API:",user_api_res)
+    try:
+        user_api_root_url = settings.portal_user_source_codes
+        sub_url = f'{spu_pk}/{code_name}.json'
+        user_api = os.path.join(user_api_root_url, sub_url)
+        user_api_res = session_request(user_api)
+        logger.debug("【serice_exec_code】 res from user API:{}".format(user_api_res))
 
-    test_api_root_url = settings.portal_test_source_codes
-    sub_url = f'{spu_pk}/{code_name}.json'
-    test_api = os.path.join(test_api_root_url, sub_url)
-    test_api_res = session_request(test_api)
-    print("serice_exec_code res from test API:",test_api_res)
-    
-    # if len(user_api_res) == 0:
-    if user_api_res.status_code == 200:
-        dict = json.loads(user_api_res.text)
-    else:
-        print(f'User API error with code:{user_api_res.status_code}, now try market-test API...')
-        if test_api_res.status_code == 200:
-            dict = json.loads(test_api_res.text)
-            # print(test_api_res.text)
+        test_api_root_url = settings.portal_test_source_codes
+        sub_url = f'{spu_pk}/{code_name}.json'
+        test_api = os.path.join(test_api_root_url, sub_url)
+        test_api_res = session_request(test_api)
+        logger.debug("【serice_exec_code】 res from test API:{}".format(test_api_res))
+        
+
+        # if len(user_api_res) == 0:
+        user_api_status_code = user_api_res.status_code if hasattr(user_api_res, "status_code") else None
+        if user_api_status_code == 200:
+            dict = json.loads(user_api_res.text)
+
         else:
-            print(f"Market-test API error with code:{test_api_res.status_code}.")
+            logger.debug("User API error with code:'{}',now try market-test API...".format(user_api_status_code))
+
+            test_api_status_code = test_api_res.status_code if hasattr(test_api_res, "status_code") else None
+            if test_api_status_code == 200:
+                dict = json.loads(test_api_res.text)
+                # print(test_api_res.text)
+            else:
+                logger.debug("Market-test API error with code:{}".format(test_api_status_code))
+                res = {
+                    "user_api_status_code":user_api_status_code,                    
+                    "test_api_status_code":test_api_status_code,
+                    "user_api_res": user_api_res,
+                    "test_api_res": test_api_res,
+                    "exception": None,
+                    "has_error": True,
+                    "code": None
+                }
+                return res
+    
+        if len(dict) == 0:
+            logger.info("No code to execute.")
             res = {
-                "user_api_code":user_api_res.status_code,
-                "test_api_code":test_api_res.status_code,
-                "has_error": True,
+                "user_api_status_code":user_api_status_code,
+                "test_api_status_code":test_api_status_code,
+                "user_api_res": user_api_res,
+                "test_api_res": test_api_res,
+                "exception": None,
+                "has_error": False,
                 "code": None
             }
             return res
-   
-    if len(dict) == 0:
-        print("No code to execute.")
+        else:
+            dict = dict[0]
+            code = dict['code_content']
+            res = {
+                "user_api_status_code":user_api_status_code,
+                "test_api_status_code":test_api_status_code,
+                "exception": None,
+                "has_error": False,
+                "code": code
+            }
+            return res
+    except Exception as e:
+        logger.debug("Exception:{}".format(e))
         res = {
-            "user_api_code":user_api_res.status_code,
-            "test_api_code":test_api_res.status_code,
-            "has_error": False,
-            "code": None
+            "user_api_status_code":"unknown",
+            "test_api_status_code":"unknown",
+            "user_api_res": "unknown",
+            "test_api_res": "unknown",
+            "exception": e,
+            "has_error": True,
+            "code": None,
         }
-        return res
-    else:
-        dict = dict[0]
-        code = dict['code_content']
-        res = {
-            "user_api_code":user_api_res.status_code,
-            "test_api_code":test_api_res.status_code,
-            "has_error": False,
-            "code": code
-        }
-        return res
-    # except Exception as e:
-    #     print("error:", e)
+
 
 
 def session_request(url):    
@@ -109,17 +135,16 @@ def session_request(url):
     try:
         # res = http.request("GET", url)
         res = sss.get(url, headers = my_headers)
-        print("market link response:+++++++++++++++++++++++++++++++++","\n",res)
-        print('Response status code:',res.status_code)
+        logger.debug("market link response:+++++++++++++++++++++++++++++++++\n{}".format(res))
+        logger.debug("Response status code:{}".format(res.status_code))
         # print("Response headers:",res.headers)
         # print(res.body.decode('utf-8'))
 
         # res = json.loads(res.text)
 
     except Exception as e:
-        print(e)
-        # print("Can't handle json.loads: \n")
-        return False
-    print("Response:+++++++++++++++++++++++++++++++++","\n",res)
+        logger.debug("Exception:{}".format(e))
+        return e
+    logger.debug("Response:+++++++++++++++++++++++++++++++++\n{}".format(res))
     # print('session:',res['session_id'])
     return res

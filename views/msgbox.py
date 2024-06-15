@@ -1,5 +1,8 @@
 import bpy
 
+
+
+
 def msgbox(message="", title="Message Box", icon='INFO'):
     def draw(self, context):
         self.layout.label(text=message)
@@ -13,13 +16,13 @@ def msgbox(message="", title="Message Box", icon='INFO'):
 
 
 
-class PORTAL_OT_msgbox(bpy.types.Operator):
-    bl_idname = "portal.msgbox"
+class TELE_OT_msgbox(bpy.types.Operator):
+    bl_idname = "tele.msgbox"
     bl_label = "Notice"
     bl_description = "Message Box with confirm button"
     bl_options = {"REGISTER"}
 
-    msg : bpy.props.StringProperty(default='')
+    msg : bpy.props.StringProperty(default='') # type: ignore
 
     @classmethod
     def poll(cls, context):
@@ -33,16 +36,22 @@ class PORTAL_OT_msgbox(bpy.types.Operator):
         # return context.window_manager.invoke_confirm(self, event)
         return context.window_manager.invoke_props_dialog(self)
 
+    def get_list(self, msg):
+        return list(msg.split(";"))
+
     def draw(self, ctx):
-        row = self.layout
-        row.label(text=self.msg)
+        
+        msg_list = self.get_list(self.msg)
+        for msg in msg_list:
+            row = self.layout
+            row.label(text=msg)
     
         
         
 
 
 classes = [
-    PORTAL_OT_msgbox,
+    TELE_OT_msgbox,
 ]
 
 

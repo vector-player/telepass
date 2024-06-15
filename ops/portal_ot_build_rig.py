@@ -2,6 +2,10 @@ import bpy
 import threading    
 from ..views.preferences import is_installed
 from ..views.msgbox import msgbox
+import logging
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s【%(levelname)s】(%(name)s-No.%(lineno)d):%(funcName)s -> %(message)s")
+logger = logging.getLogger(__name__)
+
 
 
 class PORTAL_OT_build_rig(bpy.types.Operator):
@@ -27,8 +31,9 @@ class PORTAL_OT_build_rig(bpy.types.Operator):
             msg = "RPyC is not installed. Please install it in User Preferences."
             # cls.report({'INFO'}, msg)
             # msgbox(msg, 'Warning', 'ERROR')
-            bpy.ops.portal.msgbox('INVOKE_DEFAULT', msg=msg)
-            print(msg)
+            bpy.ops.tele.msgbox('INVOKE_DEFAULT', msg=msg)
+            logger.debug("{}".format(msg))
+
             return {"FINISHED"}
 
         from ..services.service_network import public_ip
@@ -37,8 +42,8 @@ class PORTAL_OT_build_rig(bpy.types.Operator):
             msg = "Operator abort: Portal Rig root IP address is empty."
             # cls.report({'ERROR'}, err)
             # msgbox(err, 'Warning', 'ERROR')
-            bpy.ops.portal.msgbox('INVOKE_DEFAULT', msg=msg)
-            print(msg)            
+            bpy.ops.tele.msgbox('INVOKE_DEFAULT', msg=msg)
+            logger.debug("{}".format(msg))           
             return {"FINISHED"}
 
         # services.global_variable.set('ctx',ctx)
@@ -62,7 +67,7 @@ class PORTAL_OT_build_rig(bpy.types.Operator):
         # t1 = threading.Thread(target=self.start_rpyc(ctx))  ## To catch the real 'ctx' by instancing before Opt 'FINISHED'. However, thread instance causes sync blocking and screen freezing.
         msg = 'Start Portal Rig service.'
         self.report({'INFO'}, msg)
-        print(msg)
+        logger.debug("{}".format(msg))
 
         ## Comment out python threading to avoid multi-threads conflict: Using RPyC ThreadedServer
         # self.start_rpyc()

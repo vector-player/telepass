@@ -16,6 +16,9 @@ bl_info = {
 import os
 # sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 # sys.path.append(os.path.abspath('.views')) 
+import logging
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s【%(levelname)s】(%(name)s-No.%(lineno)d):%(funcName)s -> %(message)s")
+logger = logging.getLogger(__name__)
 import bpy
 from . import addon_updater_ops
 from . import settings
@@ -49,7 +52,7 @@ def on_register():
     try:
         bpy.ops.portal.init('INVOKE_DEFAULT')
     except Exception as e:
-        print("Error while try to get market info on register:",e)
+        logger.debug("Error while try to get market info on register:{}".format(e))
     ## this will happen .01 seconds after addon registration completes.
     ## according to the timer in rergister() function.
     # try:

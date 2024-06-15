@@ -8,6 +8,10 @@ import os
 import importlib
 import ctypes
 from typing import Annotated
+import logging
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s【%(levelname)s】(%(name)s-No.%(lineno)d):%(funcName)s -> %(message)s")
+logger = logging.getLogger(__name__)
+
 
 ##+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++##
 ## Define Functions                                                          ##
@@ -304,7 +308,8 @@ def get_user_keyconfig(key):
                         found_item = False
         if found_item:
             return item
-    print(f"Couldn't find keymap item for {key}, using addon keymap instead. This won't be saved across sessions!")
+
+    logger.debug("Couldn't find keymap item for '{}', using addon keymap instead. This won't be saved across sessions!".format(key))
     return kmi
 
 

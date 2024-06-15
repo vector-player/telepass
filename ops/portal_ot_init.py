@@ -23,7 +23,7 @@ class PORTAL_OT_init(bpy.types.Operator):
         except Exception as e:
             msg = 'Something wrong while connecting...'
             # msgbox(msg, 'Warning')
-            bpy.ops.portal.msgbox('INVOKE_DEFAULT', msg=msg)
+            bpy.ops.tele.msgbox('INVOKE_DEFAULT', msg=msg)
             self.report({'INFO'}, msg)
             print(e) 
 
@@ -34,7 +34,7 @@ class PORTAL_OT_init(bpy.types.Operator):
     #     except Exception as e:
     #         msg = 'Portal Rig server init error.'
     #         # msgbox(msg, 'Warning')
-    #         bpy.ops.portal.msgbox('INVOKE_DEFAULT', msg=msg)
+    #         bpy.ops.tele.msgbox('INVOKE_DEFAULT', msg=msg)
     #         self.report({'INFO'}, msg)
     #         print(e)
 

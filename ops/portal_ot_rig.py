@@ -23,7 +23,7 @@ class PORTAL_OT_rig(bpy.types.Operator):
             # cls.report({'INFO'}, msg)
             from ..views.msgbox import msgbox
             # msgbox(msg, 'Warning', 'ERROR')
-            bpy.ops.portal.msgbox('INVOKE_DEFAULT', msg=msg)
+            bpy.ops.tele.msgbox('INVOKE_DEFAULT', msg=msg)
             print(msg)
             return {"FINISHED"}
 

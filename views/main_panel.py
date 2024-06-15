@@ -47,7 +47,10 @@ class PORTAL_PT_main_panel(bpy.types.Panel):
         row_login_3 = layout.row()
         row_login_3.prop(ctx.preferences.addons[addon_name].preferences,"portal_password",text=ptext("PASSWORD"))
         row_login_4 = layout.row()
+        row_login_4.operator('portal.init',text="refresh")
         row_login_4.operator('portal.login')
+        row_login_4.operator('preferences.addon_show',icon='PREFERENCES',).module=addon_name
+        # row_login_4.prop(ctx.preferences.addons[addon_name],"preferences", toggle=-1, icon='PREFERENCES',icon_only=True, )
 
 
         box_tab = layout.box()

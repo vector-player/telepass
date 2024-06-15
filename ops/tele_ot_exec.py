@@ -1,4 +1,8 @@
 import bpy
+import logging
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s【%(levelname)s】(%(name)s-No.%(lineno)d):%(funcName)s -> %(message)s")
+logger = logging.getLogger(__name__)
+
 
 class TELE_OT_exec(bpy.types.Operator):
     """
@@ -26,28 +30,46 @@ class TELE_OT_exec(bpy.types.Operator):
             id = ctx.scene.portal_active_user_addon_id
 
         msg = f"Call cloud function '{self.ref}' of Product No._{id}_, ..."
-        print(msg)
+        logger.info(msg)
         self.report({'INFO'}, msg)
+        # bpy.ops.tele.msgbox('INVOKE_DEFAULT',msg=msg)
 
         if not id:
             msg = 'SPU PK/ID not specified.'
             self.report({'INFO'}, msg)
+            bpy.ops.tele.msgbox('INVOKE_DEFAULT',msg=msg)
             print(msg)
         if self.ref == '':
             msg = 'Sourcecode name not specified.'
             self.report({'INFO'}, msg)
+            bpy.ops.tele.msgbox('INVOKE_DEFAULT',msg=msg)
             print(msg)
         from ..services.service_exec_code import get_code_by_name
         res = get_code_by_name(id, self.ref)
+        print(res)
         
+        if res['has_error']:
+            msg = f"Error: user api:{res['user_api_status_code']}; {res['user_api_res']}; \ntest api status_code:{res['test_api_status_code']}; {res['test_api_res']};\nException:{res['exception']}"
+            self.report({'INFO'}, msg)
+            bpy.ops.tele.msgbox('INVOKE_DEFAULT',msg=msg)
+            return {"FINISHED"}
         
-        try:          
-            exec(res['code'])
-        except Exception as e:
-            
-            bpy.ops.portal.msgbox('INVOKE_DEFAULT',msg="Error: " + str(e))
-            print(e)
-        return {"FINISHED"}
+        elif res['code'] is None:
+            msg = "No code to execute."
+            self.report({'INFO'}, msg)
+            bpy.ops.tele.msgbox('INVOKE_DEFAULT',msg=msg)
+            return {"FINISHED"}
+        
+        else:
+        
+            try:          
+                exec(res['code'])
+            except Exception as e:                
+                bpy.ops.tele.msgbox('INVOKE_DEFAULT',msg="Error: " + str(e))
+                print(e)
+                
+
+            return {"FINISHED"}
         
         # if res['has_error'] == True:
         #     msg = res['user_api_code'] + ';' + res['test_api_code'] + ";"
@@ -55,7 +77,7 @@ class TELE_OT_exec(bpy.types.Operator):
         # if res['code'] is None:
         #     msg += 'Cannot get source code.'
 
-        # bpy.ops.portal.msgbox('INVOKE_DEFAULT',msg)
+        # bpy.ops.tele.msgbox('INVOKE_DEFAULT',msg)
         # return {"FINISHED"}
 
 

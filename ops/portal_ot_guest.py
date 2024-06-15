@@ -4,6 +4,10 @@ import urllib3
 from .. import settings
 from .._types.sku_spu import SKU_SPU_Serializer
 from ..services.service_previews import load_previews_market_sku
+import logging
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s【%(levelname)s】(%(name)s-No.%(lineno)d):%(funcName)s -> %(message)s")
+logger = logging.getLogger(__name__)
+
 
 class PORTAL_OT_guest(bpy.types.Operator):
     bl_idname = "portal.guest"
@@ -18,7 +22,7 @@ class PORTAL_OT_guest(bpy.types.Operator):
     def session_request(self, ctx, url):    
         # sss = requests.Session() ## Don't create a new SessionObj, or else it maintain different session
         sss = settings.session_obj
-        print('session:',sss)
+        logger.debug("session:{}".format(sss))
         my_headers = {
             'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36',
             'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -29,17 +33,17 @@ class PORTAL_OT_guest(bpy.types.Operator):
         try:
             # res = http.request("GET", url)
             res = sss.get(url, headers = my_headers)
-            print("market link response:+++++++++++++++++++++++++++++++++","\n",res)
-            print('Response status code:',res.status_code)
+            logger.debug("market link response:+++++++++++++++++++++++++++++++++\n{}".format(res))
+            logger.debug("Response status code:{}".format(res.status_code))
             # print("Response headers:",res.headers)
             # print(res.body.decode('utf-8'))
             
             res = json.loads(res.text)
         except Exception as e:
-            print(e)
-            print("Can't handle json.loads: \n")
+            logger.debug("{}".format(e))
+            logger.debug("Can't handle json.loads: \n")
             return False
-        print("market link response:+++++++++++++++++++++++++++++++++","\n",res)
+        logger.debug("market link response:+++++++++++++++++++++++++++++++++\n{}".format(res))
         # print('session:',res['session_id'])
         return res
 
@@ -47,26 +51,26 @@ class PORTAL_OT_guest(bpy.types.Operator):
     def execute(self, ctx):
 
         ## Try market:++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        print("Start MARKET request:")
+        logger.debug("Start MARKET request:")
         try:      
             # api_market_sku_spus = self.csrf_login(ctx, settings.portal_market_addons_url)
             api_market_sku_spus = self.session_request(ctx, settings.portal_market_addons_url)
         except Exception as e:
             msg = 'Login Failed. Check market connection.'
-            print(msg)
+            logger.debug("{}".format(msg))
             self.report({'INFO'}, msg)
-            print(e)
+            logger.debug("{}".format(e))
             return {"FINISHED"}
 
         if not api_market_sku_spus:
             msg = 'Market response is None. Check market connection.'
-            print(msg)
+            logger.debug("{}".format(msg))
             self.report({'INFO'}, msg)
             return {"FINISHED"}
         # code_names = self.parse_purchased_codenames(spus)
         # ctx.scene.user_addon_names = self.parse_user_spus(spus, 'title')        
         settings.portal_market_addons = SKU_SPU_Serializer(api_market_sku_spus)
-        print("LOGIN INFO:portal_market_addons found:",len(settings.portal_market_addons))
+        logger.debug("LOGIN INFO:portal_market_addons found:{}".format(settings.portal_market_addons))
         # load_previews_market_sku(ctx.scene.portal_sku_market_previews, ctx)
         ## Cause WARNING
         # WARN (bpy.rna): C:\Users\blender\git\blender-vdev\blender.git\source\blender\python\intern\bpy_rna.c:1340 pyrna_enum_to_py: current value '0' matches no enum in 'Scene', 'Scene', 'portal_sku_market_previews'

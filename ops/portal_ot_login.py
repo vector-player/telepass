@@ -1,6 +1,10 @@
 import bpy
 import json
 import threading
+import logging
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s【%(levelname)s】(%(name)s-No.%(lineno)d):%(funcName)s -> %(message)s")
+logger = logging.getLogger(__name__)
+
 from .. import settings
 from .. settings import (
     ## Only for Readonly variables. 
@@ -52,7 +56,7 @@ class PORTAL_OT_login(bpy.types.Operator):
         # bpy.ops.portal.rig(ref='mission-1')
 
         ## Try User request
-        print("Start USER request:")
+        logger.debug("Start USER request:")
         
         # url = ctx.preferences.addons[addon_name].preferences.portal_ip
         # api_user_sku_spus = self.csrf_login(ctx, url)
@@ -61,22 +65,22 @@ class PORTAL_OT_login(bpy.types.Operator):
             url = ctx.preferences.addons[addon_name].preferences.portal_ip
             res = self.csrf_login(ctx, url)
             msg = f"Connection status:{res.status_code}"
-            print(msg)
+            logger.debug("{}".format(msg))
             self.report({'INFO'}, msg)
             
             if res.status_code == 200:
                 msg = "Connect successfully."
-                print(msg)
+                logger.debug("{}".format(msg))
                 self.report({'INFO'}, msg)
 
             api_user_sku_spus = json.loads(res.text)
             msg = f"response from api_user_sku_spus:{api_user_sku_spus}"
-            print(msg)
+            logger.debug("{}".format(msg))
             self.report({'INFO'}, msg)
 
             if api_user_sku_spus == False:
                 msg = 'Login Failed. Check Username and Password.'
-                print(msg)
+                logger.debug("{}".format(msg))
                 self.report({'INFO'}, msg)
                 ## put an empty list to clear UI Previews
                 SKU_SPU_Serializer([])
@@ -84,22 +88,22 @@ class PORTAL_OT_login(bpy.types.Operator):
                 return {"FINISHED"}
             if not api_user_sku_spus:
                 msg = 'Response is None. Go to market and see what you would like.'
-                print(msg)
+                logger.debug("{}".format(msg))
                 self.report({'INFO'}, msg)
                 return {"FINISHED"}
 
             
         except Exception as e:
             msg = 'Login Failed. Check user connection.'
-            print(msg)
+            logger.debug("{}".format(msg))
             self.report({'INFO'}, msg)
-            print(e)
+            logger.debug("{}".format(e))
             return {"FINISHED"}
 
         # code_names = self.parse_purchased_codenames(spus)
         # ctx.scene.user_addon_names = self.parse_user_spus(spus, 'title')
         settings.portal_user_addons = SKU_SPU_Serializer(api_user_sku_spus)
-        print("LOGIN INFO: portal_user_addons:",len(settings.portal_user_addons))
+        logger.debug("LOGIN INFO: portal_user_addons:{}".format(len(settings.portal_user_addons)))
         load_previews_user_sku(self, ctx)
         # ctx.scene.portal_sku_user_previews = str(0) ## active enum_items(1)
 
@@ -130,17 +134,17 @@ class PORTAL_OT_login(bpy.types.Operator):
         #获取token
         # sss = requests.Session()
         sss = settings.session_obj
-        print('session:',sss)
+        logger.debug("session:{}".format(sss))
         
         try:
             # res = sss.get(url, headers = my_headers)
             res = sss.get(url)
             string = str(res.content, 'utf-8')
         except Exception as e:
-            print("Connect Failed.")
-            print(e)
+            logger.debug("Connect Failed.")
+            logger.debug("{}".format(e))
             return
-        print("Session GET res.content string:",string)
+        logger.debug("Session GET res.content string:{}".format(string))
         reg = r'<input type="hidden" name="csrfmiddlewaretoken" value="(.*)">'
         import re
         # pattern = re.compile(reg)
@@ -150,7 +154,7 @@ class PORTAL_OT_login(bpy.types.Operator):
         result = re.findall(reg, string)
 
         token = result[0]
-        print('csrf token:',token)
+        logger.debug("csrf token:{}".format(token))
         #postdata
         my_data = {
             'commit' : '登录',
@@ -168,7 +172,7 @@ class PORTAL_OT_login(bpy.types.Operator):
         # print("password:",ctx.preferences.addons[addon_name].preferences.portal_password)
         try:
             res = sss.post(url, headers = my_headers, data = my_data)
-            print("csrf POST response:+++++++++++++++++++++++++++++++++","\n",res)
+            logger.debug("csrf POST response:+++++++++++++++++++++++++++++++++\n{}:".format(res))
             
             # print(res.data.decode('utf-8'))
             # 1. response.status_code
@@ -188,8 +192,8 @@ class PORTAL_OT_login(bpy.types.Operator):
 
         #     dict = json.loads(res.text)
         except Exception as e:
-            print(e)
-            print("Can't handle json.loads: \n",res.text)
+            logger.debug("{}".format(e))
+            logger.debug("Can't handle json.loads: \n{}".format(res.text))
             return False
         # print("csrf POST response to dict:+++++++++++++++++++++++++++++++++","\n",dict)
         # print('session:',res['session_id'])
@@ -206,8 +210,8 @@ class PORTAL_OT_login(bpy.types.Operator):
                 spu_ids.append(id)
             for codename in spu['source_codes']:
                 spu_code_names.append(codename) 
-        print('purchased id:', [id for id in spu_ids])
-        print('code_names:',[c for c in spu_code_names])
+        logger.debug("purchased id:{}".format([id for id in spu_ids]))
+        logger.debug("code_names:{}".format([c for c in spu_code_names]))
         return spu_ids
         # return spu_code_names
 
@@ -217,7 +221,7 @@ class PORTAL_OT_login(bpy.types.Operator):
         for spu in spus:
             for value in spu[f'{dict_key}']:
                 values.append(value)
-        print(f'{dict_key}:', [v for v in values])
+        logger.debug("{}:{}".format(dict_key, [v for v in values]))
         return values
 
 

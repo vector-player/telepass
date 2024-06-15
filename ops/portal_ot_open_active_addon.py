@@ -22,6 +22,12 @@ class PORTAL_OT_open_active_addon(bpy.types.Operator):
                 print(msg)
                 return {"FINISHED"}
             
+            if not id in settings.portal_market_addons:
+                msg = f"Error: check key value {id} exists."
+                self.report({'INFO'}, msg)
+                print(msg)
+                return {"FINISHED"}
+
             if settings.portal_market_addons[id].status == 'test':                
                 bpy.ops.tele.exec(ref='init')
                 return {"FINISHED"}
