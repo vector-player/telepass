@@ -3,8 +3,8 @@ import bpy
 
 class PORTAL_OT_init(bpy.types.Operator):
     bl_idname = "portal.init"
-    bl_label = "Start Portal"
-    bl_description = "After any error, try this button to restart portal."
+    bl_label = "Refresh"
+    bl_description = "Refresh, restart or recover from errors"
     bl_options = {"REGISTER"}
 
     @classmethod

@@ -28,6 +28,7 @@ from .views import msgbox
 # from .views import preferences
 # from .views import opt
 from .ops import (
+    portal_ot_restore_default,
     portal_ot_init,
     holo_ot_run_script,
     portal_ot_login, 
@@ -80,6 +81,7 @@ def on_register():
 
 def register():
     addon_updater_ops.register(bl_info)
+    portal_ot_restore_default.register()
     portal_ot_init.register()
     holo_ot_run_script.register()
     portal_ot_build_rig.register()
@@ -105,6 +107,7 @@ def register():
 
 
 def unregister():
+    portal_ot_restore_default.unregister()
     portal_ot_init.unregister()
     main_panel.unregister()
     msgbox.unregister()

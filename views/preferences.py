@@ -187,6 +187,13 @@ class ExampleAddonPreferences(bpy.types.AddonPreferences):
     ## Preferences Props: referenced with 'ctx.preferences.addons[addon_name].preferences.props'
     ## type ignore: see https://github.com/microsoft/pylance-release/issues/5457
     
+    ## Show/Hide Panels
+    is_show_dependencies : bpy.props.BoolProperty(name=ptext('Dependencies'),default=False) # type: ignore
+    is_show_login_settings : bpy.props.BoolProperty(name=ptext('Login Settings'),default=False) # type: ignore
+    is_show_ui_settings : bpy.props.BoolProperty(name=ptext('UI Settings'),default=False) # type: ignore
+    is_show_update_settings : bpy.props.BoolProperty(name=ptext('Update Settings'),default=False) # type: ignore
+    is_show_export_settings : bpy.props.BoolProperty(name=ptext('Export Settings'),default=False) # type: ignore
+
     has_n_panel : bpy.props.BoolProperty(name=ptext('Show in N-Panel'),default=True, update=on_switch_has_n_panel) # type: ignore
     # is_some : bpy.props.BoolProperty(default=False)
 
@@ -194,18 +201,9 @@ class ExampleAddonPreferences(bpy.types.AddonPreferences):
     portal_username : bpy.props.StringProperty() # type: ignore
     portal_password : bpy.props.StringProperty(subtype='PASSWORD') # type: ignore
 
-    filepath: bpy.props.StringProperty(
-        name='Example File Path',
-        subtype='FILE_PATH',
-    ) # type: ignore
-    number: bpy.props.IntProperty(
-        name='Example Number',
-        default=4,
-    ) # type: ignore
-    boolean: bpy.props.BoolProperty(
-        name='Example Boolean',
-        default=False,
-    ) # type: ignore
+    filepath: bpy.props.StringProperty(name='Example File Path',subtype='FILE_PATH') # type: ignore
+    number: bpy.props.IntProperty(name='Example Number',default=4,) # type: ignore
+    boolean: bpy.props.BoolProperty(name='Example Boolean',default=False,) # type: ignore
 
 
     # addon updater preferences from `__init__`, be sure to copy all of them
@@ -253,34 +251,65 @@ class ExampleAddonPreferences(bpy.types.AddonPreferences):
         layout = self.layout        
         row = layout.row()
 
-        col_install = row.column()
-        col_install.enabled = not RPyC_installed
-        op_install_mod = col_install.operator(PORTAL_OT_install_rpyc.bl_idname, text=ptext('Install RPyC'), icon_value=36, emboss=not RPyC_installed, depress=not RPyC_installed)
-        col_uninstall = row.column()
-        col_uninstall.enabled = RPyC_installed
-        op_uninstall_mod = col_uninstall.operator(PORTAL_OT_uninstall_rpyc.bl_idname, text=ptext('remove RPyC'), icon_value=19, emboss=RPyC_installed, depress=RPyC_installed)
-        row = layout.row()
-        col_install = row.column()
-        col_install.enabled = not REQUESTS_installed
-        op_install_mod = col_install.operator(PORTAL_OT_install_requests.bl_idname, text=ptext('Install Requests'), icon_value=36, emboss=not REQUESTS_installed, depress=not REQUESTS_installed)
-        col_uninstall = row.column()
-        col_uninstall.enabled = REQUESTS_installed
-        op_uninstall_mod = col_uninstall.operator(PORTAL_OT_uninstall_requests.bl_idname, text=ptext('remove Requests'), icon_value=19, emboss=REQUESTS_installed, depress=REQUESTS_installed)
+        layout.prop(self, 'is_show_dependencies', toggle=1)
+        if self.is_show_dependencies:
+            depend_box = layout.box()            
+            row_1 = depend_box.row()
+            col_install = row_1.column()        
+            col_install.enabled = not RPyC_installed
+            op_install_mod = col_install.operator(PORTAL_OT_install_rpyc.bl_idname, text=ptext('Install RPyC'), icon_value=36, emboss=not RPyC_installed, depress=not RPyC_installed)
+            col_uninstall = row_1.column()
+            col_uninstall.enabled = RPyC_installed
+            op_uninstall_mod = col_uninstall.operator(PORTAL_OT_uninstall_rpyc.bl_idname, text=ptext('remove RPyC'), icon_value=19, emboss=RPyC_installed, depress=RPyC_installed)
+            row_2 = depend_box.row()
+            col_install = row_2.column()
+            col_install.enabled = not REQUESTS_installed
+            op_install_mod = col_install.operator(PORTAL_OT_install_requests.bl_idname, text=ptext('Install Requests'), icon_value=36, emboss=not REQUESTS_installed, depress=not REQUESTS_installed)
+            col_uninstall = row_2.column()
+            col_uninstall.enabled = REQUESTS_installed
+            op_uninstall_mod = col_uninstall.operator(PORTAL_OT_uninstall_requests.bl_idname, text=ptext('remove Requests'), icon_value=19, emboss=REQUESTS_installed, depress=REQUESTS_installed)
 
-        layout.label(text='This is a preferences view for our add-on')
-        row  = layout.row()
-        row.operator('portal.init')  # 
-        layout.prop(self, 'filepath')
-        layout.prop(self, 'number')
-        layout.prop(self, 'boolean')
+        layout.separator()
+        
+        layout.prop(self, 'is_show_login_settings', toggle=1)
+        if self.is_show_login_settings:
+            login_box = layout.box()
+            login_box.label(text=ptext("Login Settings"))
+            row = login_box.row()
+            row.prop(self, 'portal_ip', text=ptext("HOST"))
+            row.operator('portal.init', text='',icon='FILE_REFRESH')  # 
+            row.operator('portal.default', text='', icon='RECOVER_LAST')
+            row = login_box.row()
+            row.prop(self, 'portal_username', text=ptext("Username"), icon='COMMUNITY')
+            row.prop(self, 'portal_password', text=ptext("Password"), icon='KEYINGSET')
+        
 
-        row_ui_wigets = layout.row()
-        col = row_ui_wigets.column()
-        col.prop(self,'has_n_panel',text=ptext('Show in N-Panel:'))
-        col = row_ui_wigets.column()
-        col.prop(get_user_keyconfig(HOT_KEY_NAME_001), 'type', text=ptext('Hot Key'), full_event=True)
+        layout.separator()
 
-        addon_updater_ops.update_settings_ui(self,ctx)
+        layout.prop(self, 'is_show_ui_settings', toggle=1)
+        if self.is_show_ui_settings:
+            ui_widgets = layout.box()
+            ui_widgets.label(text=ptext("UI Settings"))
+            col = ui_widgets.column()
+            col.prop(self,'has_n_panel',text=ptext('Show in N-Panel:'))
+            col = ui_widgets.column()
+            col.prop(get_user_keyconfig(HOT_KEY_NAME_001), 'type', text=ptext('Hot Key'), full_event=True)
+
+
+        layout.separator()
+
+        layout.prop(self, 'is_show_export_settings', toggle=1)
+        if self.is_show_export_settings:
+            export_box = layout.box()
+            export_box.prop(self, 'filepath')
+            export_box.prop(self, 'number')
+            export_box.prop(self, 'boolean')
+
+        layout.separator()
+
+        layout.prop(self, 'is_show_update_settings', toggle=1)
+        if self.is_show_update_settings:
+            addon_updater_ops.update_settings_ui(self,ctx)
 
 ##++++++++++++++++++++++++++++++++++++++++++++++++++++++++++##
 ## Define HOT-KEY                                           ##

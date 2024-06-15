@@ -42,12 +42,13 @@ class PORTAL_PT_main_panel(bpy.types.Panel):
         # if not ctx.scene.is_login:
         row_login_1 = layout.row()
         row_login_1.prop(ctx.preferences.addons[addon_name].preferences,"portal_ip", text=ptext("HOST"))
+        row_login_1.operator('portal.default', text='', icon='RECOVER_LAST')
         row_login_2 = layout.row()
-        row_login_2.prop(ctx.preferences.addons[addon_name].preferences,"portal_username", text=ptext("USER"))
+        row_login_2.prop(ctx.preferences.addons[addon_name].preferences,"portal_username", text=ptext("USER"), icon='COMMUNITY')
         row_login_3 = layout.row()
-        row_login_3.prop(ctx.preferences.addons[addon_name].preferences,"portal_password",text=ptext("PASSWORD"))
+        row_login_3.prop(ctx.preferences.addons[addon_name].preferences,"portal_password",text=ptext("PASSWORD"), icon='KEYINGSET')
         row_login_4 = layout.row()
-        row_login_4.operator('portal.init',text="refresh")
+        row_login_4.operator('portal.init', text='', icon='FILE_REFRESH')
         row_login_4.operator('portal.login')
         row_login_4.operator('preferences.addon_show',icon='PREFERENCES',).module=addon_name
         # row_login_4.prop(ctx.preferences.addons[addon_name],"preferences", toggle=-1, icon='PREFERENCES',icon_only=True, )
@@ -74,7 +75,7 @@ class PORTAL_PT_main_panel(bpy.types.Panel):
             row_preview.template_icon_view(
                 ctx.scene, 
                 "portal_sku_market_previews",
-                show_labels=True,
+                show_labels=True,                
                 scale=6.0, 
                 scale_popup=5.0,
             )

@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class PORTAL_OT_guest(bpy.types.Operator):
     bl_idname = "portal.guest"
     bl_label = "Guest"
-    bl_description = "Guest Request to visit market"
+    bl_description = "Guest request to visit market"
     bl_options = {"REGISTER"}
 
     @classmethod
