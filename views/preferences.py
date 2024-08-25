@@ -1,7 +1,7 @@
 import bpy
 from .. import addon_updater_ops
 from bpy.app.translations import pgettext as ptext
-from ..settings import addon_name, portal_user_addons_url
+from ..settings import addon_name, python_modules, portal_user_addons_url
 from .main_panel import PORTAL_PT_main_panel
 import sys
 import os
@@ -11,6 +11,7 @@ from typing import Annotated
 import logging
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s【%(levelname)s】(%(name)s-No.%(lineno)d):%(funcName)s -> %(message)s")
 logger = logging.getLogger(__name__)
+
 
 
 ##+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++##
@@ -135,17 +136,17 @@ def class_factory_ops_uninstall_mod(mod_name):
 # bpy.utils.register_class(VP_OT_uninstall_mymod)
 
 
-def is_installed(mod_name) -> bool:
+def check_installed(mod_name) -> bool:
     """ Checks if dependency is installed. """
     try:
         spec = importlib.util.find_spec(mod_name)
     except (ModuleNotFoundError, ValueError, AttributeError): 
-        print(mod_name,"is not installed")           
+        # print(mod_name,"is not installed")           
         return False
 
     # only accept it as valid if there is a source file for the module - not bytecode only.
     if issubclass(type(spec), importlib.machinery.ModuleSpec):
-        print(mod_name,"is installed")         
+        # print(mod_name,"is installed")         
         return True
 
     print(mod_name,"is not installed")  
@@ -171,16 +172,22 @@ def on_switch_has_n_panel(self,ctx):
 ##++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++##
 # VP_OT_install_pywin32 = class_factory_ops_install_mod("pywin32")
 # VP_OT_uninstall_pywin32 = class_factory_ops_uninstall_mod("pywin32")
-PORTAL_OT_install_rpyc = class_factory_ops_install_mod('rpyc')
-PORTAL_OT_uninstall_rpyc = class_factory_ops_uninstall_mod('rpyc')
+# PORTAL_OT_install_rpyc = class_factory_ops_install_mod('rpyc')
+# PORTAL_OT_uninstall_rpyc = class_factory_ops_uninstall_mod('rpyc')
 
-PORTAL_OT_install_requests = class_factory_ops_install_mod('requests')
-PORTAL_OT_uninstall_requests = class_factory_ops_uninstall_mod('requests')
+# PORTAL_OT_install_requests = class_factory_ops_install_mod('requests')
+# PORTAL_OT_uninstall_requests = class_factory_ops_uninstall_mod('requests')
 
-PORTAL_OT_install_pywebview = class_factory_ops_install_mod('pywebview')
-PORTAL_OT_uninstall_pywebview = class_factory_ops_uninstall_mod('pywebview')
+# PORTAL_OT_install_pywebview = class_factory_ops_install_mod('pywebview')
+# PORTAL_OT_uninstall_pywebview = class_factory_ops_uninstall_mod('pywebview')
+
+pref_ops_classes = []
+for mod in python_modules:
+    pref_ops_classes.append(class_factory_ops_install_mod(mod['install_name']))
+    pref_ops_classes.append(class_factory_ops_uninstall_mod(mod['install_name']))
+
 ##++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-class ExampleAddonPreferences(bpy.types.AddonPreferences):
+class TelepassAddonPreferences(bpy.types.AddonPreferences):
     # this must match the add-on name, use '__package__'
     # when defining this in a submodule of a python package.
     # bl_idname = __name__
@@ -248,9 +255,9 @@ class ExampleAddonPreferences(bpy.types.AddonPreferences):
 
 
     def draw(self, ctx):
-        RPyC_installed = is_installed('rpyc')  ## is_installed('win32api') and is_installed('win32gui') and is_installed('win32con')
-        REQUESTS_installed = is_installed('requests')
-        PYWEBVIEW_installed = is_installed('webview')
+        # RPyC_installed = check_installed('rpyc')  ## check_installed('win32api') and check_installed('win32gui') and check_installed('win32con')
+        # REQUESTS_installed = check_installed('requests')
+        # PYWEBVIEW_installed = check_installed('webview')
 
         layout = self.layout        
         row = layout.row()
@@ -259,32 +266,45 @@ class ExampleAddonPreferences(bpy.types.AddonPreferences):
         if self.is_show_dependencies:
             depend_box = layout.box()   
 
-            ## mod1: rpyc         
-            row_1 = depend_box.row()
-            col_install = row_1.column()        
-            col_install.enabled = not RPyC_installed
-            op_install_mod = col_install.operator(PORTAL_OT_install_rpyc.bl_idname, text=ptext('Install RPyC'), icon_value=36, emboss=not RPyC_installed, depress=not RPyC_installed)
-            col_uninstall = row_1.column()
-            col_uninstall.enabled = RPyC_installed
-            op_uninstall_mod = col_uninstall.operator(PORTAL_OT_uninstall_rpyc.bl_idname, text=ptext('remove RPyC'), icon_value=19, emboss=RPyC_installed, depress=RPyC_installed)
-            
-            ## mod2: requests
-            row_2 = depend_box.row()
-            col_install = row_2.column()
-            col_install.enabled = not REQUESTS_installed
-            op_install_mod = col_install.operator(PORTAL_OT_install_requests.bl_idname, text=ptext('Install Requests'), icon_value=36, emboss=not REQUESTS_installed, depress=not REQUESTS_installed)
-            col_uninstall = row_2.column()
-            col_uninstall.enabled = REQUESTS_installed
-            op_uninstall_mod = col_uninstall.operator(PORTAL_OT_uninstall_requests.bl_idname, text=ptext('remove Requests'), icon_value=19, emboss=REQUESTS_installed, depress=REQUESTS_installed)
+            for module in python_modules:
+                mod_name = module['install_name']
+                check_name = module['check_installed_name']
+                is_installed = check_installed(check_name)
 
-            ## mod3: pywebview         
-            row_3 = depend_box.row()
-            col_install = row_3.column()        
-            col_install.enabled = not PYWEBVIEW_installed
-            op_install_mod = col_install.operator(PORTAL_OT_install_pywebview.bl_idname, text=ptext('Install pywebview'), icon_value=36, emboss=not PYWEBVIEW_installed, depress=not PYWEBVIEW_installed)
-            col_uninstall = row_3.column()
-            col_uninstall.enabled = PYWEBVIEW_installed
-            op_uninstall_mod = col_uninstall.operator(PORTAL_OT_uninstall_pywebview.bl_idname, text=ptext('remove pywebview'), icon_value=19, emboss=PYWEBVIEW_installed, depress=PYWEBVIEW_installed)
+                new_row = depend_box.row()
+                col_install = new_row.column()        
+                col_install.enabled = not is_installed
+                op_install_mod = col_install.operator(f"vp.install_{mod_name}", text=ptext(f'Install {mod_name}'), icon_value=36, emboss=not is_installed, depress=not is_installed)
+                col_uninstall = new_row.column()
+                col_uninstall.enabled = is_installed
+                op_uninstall_mod = col_uninstall.operator(f"vp.uninstall_{mod_name}", text=ptext(f'remove {mod_name}'), icon_value=19, emboss=is_installed, depress=is_installed)
+
+            # ## mod1: rpyc         
+            # row_1 = depend_box.row()
+            # col_install = row_1.column()        
+            # col_install.enabled = not RPyC_installed
+            # op_install_mod = col_install.operator(PORTAL_OT_install_rpyc.bl_idname, text=ptext('Install RPyC'), icon_value=36, emboss=not RPyC_installed, depress=not RPyC_installed)
+            # col_uninstall = row_1.column()
+            # col_uninstall.enabled = RPyC_installed
+            # op_uninstall_mod = col_uninstall.operator(PORTAL_OT_uninstall_rpyc.bl_idname, text=ptext('remove RPyC'), icon_value=19, emboss=RPyC_installed, depress=RPyC_installed)
+            
+            # ## mod2: requests
+            # row_2 = depend_box.row()
+            # col_install = row_2.column()
+            # col_install.enabled = not REQUESTS_installed
+            # op_install_mod = col_install.operator(PORTAL_OT_install_requests.bl_idname, text=ptext('Install Requests'), icon_value=36, emboss=not REQUESTS_installed, depress=not REQUESTS_installed)
+            # col_uninstall = row_2.column()
+            # col_uninstall.enabled = REQUESTS_installed
+            # op_uninstall_mod = col_uninstall.operator(PORTAL_OT_uninstall_requests.bl_idname, text=ptext('remove Requests'), icon_value=19, emboss=REQUESTS_installed, depress=REQUESTS_installed)
+
+            # ## mod3: pywebview         
+            # row_3 = depend_box.row()
+            # col_install = row_3.column()        
+            # col_install.enabled = not PYWEBVIEW_installed
+            # op_install_mod = col_install.operator(PORTAL_OT_install_pywebview.bl_idname, text=ptext('Install pywebview'), icon_value=36, emboss=not PYWEBVIEW_installed, depress=not PYWEBVIEW_installed)
+            # col_uninstall = row_3.column()
+            # col_uninstall.enabled = PYWEBVIEW_installed
+            # op_uninstall_mod = col_uninstall.operator(PORTAL_OT_uninstall_pywebview.bl_idname, text=ptext('remove pywebview'), icon_value=19, emboss=PYWEBVIEW_installed, depress=PYWEBVIEW_installed)
 
 
         layout.separator()
@@ -364,14 +384,16 @@ def get_user_keyconfig(key):
 ## Register                                                      ##
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++##
 classes = [
-    PORTAL_OT_install_rpyc,
-    PORTAL_OT_uninstall_rpyc,
-    PORTAL_OT_install_requests,
-    PORTAL_OT_uninstall_requests,
-    PORTAL_OT_install_pywebview,
-    PORTAL_OT_uninstall_pywebview,
-    ExampleAddonPreferences,
+    # PORTAL_OT_install_rpyc,
+    # PORTAL_OT_uninstall_rpyc,
+    # PORTAL_OT_install_requests,
+    # PORTAL_OT_uninstall_requests,
+    # PORTAL_OT_install_pywebview,
+    # PORTAL_OT_uninstall_pywebview,
+    TelepassAddonPreferences,
 ]
+
+classes += pref_ops_classes
 
 def register():
 

@@ -6,7 +6,7 @@ from ..services.service_subwindow import create_window
 from ..services.service_image import parse_image_from_text, parse_image_from_text_re
 from ..services.service_previews import load_image_list, load_image_dict
 from ..services.service_pywebview import display_html_string
-from ..views.preferences import is_installed
+from ..views.preferences import check_installed
 from ..views.msgbox import msgbox
 import threading
 
@@ -26,7 +26,7 @@ class PORTAL_OT_show_detail(Operator):
         ## handle text
 
         try:
-            if is_installed('webview'):
+            if check_installed('webview'):
                 # display_html_string(self.string)
                 t = threading.Thread(target=self.webview, args=())
                 t.start()
@@ -64,6 +64,12 @@ class PORTAL_OT_show_detail(Operator):
 
     def webview(self):
         display_html_string(self.string)
+        # try:
+        #     display_html_string(self.string)
+        # except Exception as e:
+        #     msg = f"webview error:{e}."
+        #     print(msg)
+        #     self.report({'INFO'}, msg)
 
 
 classes = [

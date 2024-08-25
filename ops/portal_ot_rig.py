@@ -17,8 +17,8 @@ class PORTAL_OT_rig(bpy.types.Operator):
 
     def execute(self, context):
         ## Check dependency
-        from ..views.preferences import is_installed
-        if not is_installed('rpyc'):
+        from ..views.preferences import check_installed
+        if not check_installed('rpyc'):
             msg = "RPyC is not installed. Please install it in User Preferences."
             # cls.report({'INFO'}, msg)
             from ..views.msgbox import msgbox

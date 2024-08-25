@@ -1,6 +1,6 @@
 import bpy
 import threading    
-from ..views.preferences import is_installed
+from ..views.preferences import check_installed
 from ..views.msgbox import msgbox
 import logging
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s【%(levelname)s】(%(name)s-No.%(lineno)d):%(funcName)s -> %(message)s")
@@ -27,7 +27,7 @@ class PORTAL_OT_build_rig(bpy.types.Operator):
         return True
 
     def execute(self, ctx): 
-        if not is_installed('rpyc'):
+        if not check_installed('rpyc'):
             msg = "RPyC is not installed. Please install it in User Preferences."
             # cls.report({'INFO'}, msg)
             # msgbox(msg, 'Warning', 'ERROR')

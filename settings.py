@@ -5,6 +5,11 @@ import requests
 # root_path = os.path.dirname(os.path.abspath(os.path.realpath(__file__)))
 # img_dir = os.path.join(root_path,'images')
 
+python_modules = [
+    {  'install_name':'requests',  'check_installed_name':'request', },
+    {  'install_name':'rpyc',  'check_installed_name':'rpyc', },
+    {  'install_name':'pywebview',  'check_installed_name':'webview', },
+]
 root_dir = os.path.realpath("./")
 addon_name = os.path.basename(root_dir)
 img_dir = os.path.realpath("./images/")
