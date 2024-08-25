@@ -1,4 +1,5 @@
 import bpy
+import json
 import os
 from bpy.types import PropertyGroup
 from bpy.props import CollectionProperty, IntProperty, StringProperty, BoolProperty, EnumProperty
@@ -14,6 +15,8 @@ logger = logging.getLogger(__name__)
 
 class PORTAL_SKU_SPU(object):
     id : int
+    title : str
+    subtitle : str
     status : str
     spu = {}
     source_codes = []
@@ -21,12 +24,13 @@ class PORTAL_SKU_SPU(object):
     pub_date : str
     is_delete : bool
     img : str
+    atlas = []
     price : str
     cost_price : str
     discount_price : str
     stock : int
     sales : int
-    code : str
+    sn : str
     volume : str
     weight : str
     specs = []
@@ -45,7 +49,7 @@ class PORTAL_PG_SKU_SPU(PropertyGroup):
     discount_price : StringProperty() # type: ignore
     stock : IntProperty() # type: ignore
     sales : IntProperty() # type: ignore
-    code : StringProperty() # type: ignore
+    sn : StringProperty() # type: ignore
     volume : StringProperty() # type: ignore
     weight : StringProperty() # type: ignore
     specs : CollectionProperty(type=bpy.types.Text) # type: ignore
@@ -61,8 +65,11 @@ def SKU_SPU_Serializer(api_sku_spus):
         portal_sku_spu = PORTAL_SKU_SPU()
 
         portal_sku_spu.id = api['id']
+        portal_sku_spu.title = api['title']
+        portal_sku_spu.subtitle = api['subtitle']
         portal_sku_spu.status = api['status']
-        portal_sku_spu.spu = spu.SPUS_Serializer([api['spu'],])[str(api['id'])]
+        # portal_sku_spu.spu = spu.SPUS_Serializer([api['spu'],])[str(api['id'])]
+        portal_sku_spu.spu = spu.SPU_Serializer(api['spu'])
 
         for sc in api['source_codes']:            
             portal_sku_spu.source_codes.append(sc)
@@ -70,13 +77,14 @@ def SKU_SPU_Serializer(api_sku_spus):
         portal_sku_spu.add_date = api['add_date']
         portal_sku_spu.pub_date = api['pub_date']
         portal_sku_spu.is_delete = api['is_delete']
-        portal_sku_spu.img = api['img']
+        portal_sku_spu.img = api['atlas'][0]['img']
+        portal_sku_spu.atlas = api['atlas']
         portal_sku_spu.price = api['price']
         portal_sku_spu.cost_price = api['cost_price']
         portal_sku_spu.discount_price = api['discount_price']
         portal_sku_spu.stock = api['stock']
         portal_sku_spu.sales = api['sales']
-        portal_sku_spu.code = api['code']
+        portal_sku_spu.sn = api['sn']
         portal_sku_spu.volume = api['volume']
         portal_sku_spu.weight = api['weight']
         portal_sku_spu.specs = api['specs']

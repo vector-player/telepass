@@ -143,6 +143,9 @@ class PORTAL_PT_main_panel(bpy.types.Panel):
 
         addon_updater_ops.update_notice_box_ui(self, ctx)
 
+        row_test = layout.row()
+        row_test.operator("tele.test_lib")
+
         
 
 classes = [

@@ -5,6 +5,10 @@ from .. import settings
 from ..services.service_subwindow import create_window
 from ..services.service_image import parse_image_from_text, parse_image_from_text_re
 from ..services.service_previews import load_image_list, load_image_dict
+from ..services.service_pywebview import display_html_string
+from ..views.preferences import is_installed
+from ..views.msgbox import msgbox
+import threading
 
 class PORTAL_OT_show_detail(Operator):
     bl_idname = "portal.show_detail"
@@ -20,7 +24,22 @@ class PORTAL_OT_show_detail(Operator):
 
     def execute(self, ctx):
         ## handle text
-        create_window('TEXT_EDITOR', 640, 480, string=self.string)   
+
+        try:
+            if is_installed('webview'):
+                # display_html_string(self.string)
+                t = threading.Thread(target=self.webview, args=())
+                t.start()
+            else:
+                msg = "For better experience, install pywebview in addon's preferences panel."
+                msgbox(msg)
+                create_window('TEXT_EDITOR', 640, 480, string=self.string)  
+        except Exception as e:
+            msg = f"webview error:{e}."
+            print(msg)
+            self.report({'INFO'}, msg)   
+            msgbox(msg)         
+            create_window('TEXT_EDITOR', 640, 480, string=self.string) 
 
         return {"FINISHED"}
     
@@ -33,7 +52,7 @@ class PORTAL_OT_show_detail(Operator):
                 self.string = settings.portal_market_addons[id].spu.content
             if ctx.scene.portal_tab == 'my':
                 id = ctx.scene.portal_active_user_addon_id
-                self.string = settings.portal_user_addons[id].spu.content        
+                self.string = settings.portal_user_addons[id].spu.content       
             
         except Exception as e:
             print("Error:cannot get addons data.")
@@ -42,6 +61,9 @@ class PORTAL_OT_show_detail(Operator):
         return self.execute(ctx)
     ## Use Case: skip invoke for custom arguments:
     # bpy.ops.wm.mouse_position('EXEC_DEFAULT', x=20, y=66)
+
+    def webview(self):
+        display_html_string(self.string)
 
 
 classes = [

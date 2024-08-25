@@ -26,15 +26,15 @@ jobs:
 
     - name: Zip Release
       run: |
-        # 获取标签名称
+        ## get tag name
         TAG_NAME=${GITHUB_REF#refs/tags/}
-        # 创建一个临时目录来存放打包的文件
+        ## Create a temp DIR for packing files
         TEMP_DIR=$(mktemp -d)
-        # 将代码打包到临时目录中，并指定根目录名称为你想要的名称
+        ## Packing zip file to temp DIR, assign name for DIR
         git archive --format=zip --output="$TEMP_DIR/telepass.zip" --prefix="telepass/"  HEAD
-        # 将打包的 zip 文件移动到仓库的根目录
+        ## Moving zip file to root DIR of repository
         mv "$TEMP_DIR/telepass.zip" .
-        # 清理临时目录
+        ## Clear temp DIR
         rm -rf "$TEMP_DIR"
 
     - name: Upload Release Asset

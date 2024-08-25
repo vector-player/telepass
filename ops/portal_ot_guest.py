@@ -1,6 +1,7 @@
 import bpy
 import json
 import urllib3
+from requests.exceptions import RequestException
 from .. import settings
 from .._types.sku_spu import SKU_SPU_Serializer
 from ..services.service_previews import load_previews_market_sku
@@ -37,11 +38,19 @@ class PORTAL_OT_guest(bpy.types.Operator):
             logger.debug("Response status code:{}".format(res.status_code))
             # print("Response headers:",res.headers)
             # print(res.body.decode('utf-8'))
-            
-            res = json.loads(res.text)
+            if res.status_code >= 200 and res.status_code < 300:
+                res = json.loads(res.text)
+            else:
+                msg = f"Request is responsed with status code:{res.status_code}"
+                logger.debug("{}".format(msg))
+                self.report({'INFO'}, msg)
+        except RequestException as req_err:
+            logger.debug("{}".format(req_err))
+            self.report({'INFO'}, req_err)
         except Exception as e:
             logger.debug("{}".format(e))
-            logger.debug("Can't handle json.loads: \n")
+            self.report({'INFO'}, e)
+            logger.debug("Error while handling json.loads: \n")
             return False
         logger.debug("market link response:+++++++++++++++++++++++++++++++++\n{}".format(res))
         # print('session:',res['session_id'])

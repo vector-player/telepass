@@ -36,12 +36,13 @@ from .ops import (
     portal_ot_open_active_addon,
     portal_ot_build_rig,
     portal_ot_rig,
+    portal_ot_show_detail,
     portal_ot_tab,
-    portal_show_detail,
     tele_ot_exec,
 )
 from .services import service_previews
 from .services.service_previews import previews
+from .lib.test import TELE_OT_test_lib
 
 # print("cwd:",os.getcwd())
 
@@ -88,7 +89,7 @@ def register():
     portal_ot_login.register()
     portal_ot_guest.register()
     portal_ot_open_active_addon.register()
-    portal_show_detail.register()
+    portal_ot_show_detail.register()
     portal_ot_tab.register()
     portal_ot_rig.register()
     tele_ot_exec.register()
@@ -98,6 +99,7 @@ def register():
     service_previews.register()
     preferences.register()
     global_props.register()
+    TELE_OT_test_lib.register()
 
     ## timer for callback after register
     bpy.app.timers.register(on_register, first_interval=1)
@@ -120,10 +122,11 @@ def unregister():
     portal_ot_guest.unregister()
     portal_ot_login.unregister()
     portal_ot_open_active_addon.unregister()
-    portal_show_detail.unregister()
+    portal_ot_show_detail.unregister()
     portal_ot_tab.unregister()
     portal_ot_rig.unregister()
     tele_ot_exec.unregister()
+    TELE_OT_test_lib.unregister()
     # bpy.utils.previews.remove(previews['global'])
     # bpy.utils.previews.remove(previews['market_sku'])
     # bpy.utils.previews.remove(previews['user_sku'])

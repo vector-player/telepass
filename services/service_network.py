@@ -1,21 +1,20 @@
 
-import json  # 用于处理 JSON 数据
-import urllib.request  # 用于向公网IP地址查询 API 发送请求
+import json  
+import urllib.request  
 
 def public_ip():
 
-    # 获取公网出口IP地址
-    url = "https://api.ipify.org/?format=json"  # 定义查询 API 的 URL
+    url = "https://api.ipify.org/?format=json"  # this url is used to get public ip address
     try:
-        response = urllib.request.urlopen(url)  # 向查询 API 发送请求并获取响应
-        data = response.read()  # 读取响应中的数据（字节流）
-        data = data.decode("utf-8")  # 将响应数据从字节流转换为字符串
-        data = json.loads(data)  # 将响应数据解析为 JSON 格式
-        public_ip = data["ip"]  # 从 JSON 数据中提取公网IP地址
-        print("My Public IP：", public_ip)
+        response = urllib.request.urlopen(url)  # 
+        data = response.read()  # get bytes data from response
+        data = data.decode("utf-8")  # decode bytes to string
+        data = json.loads(data)  # load string to json data
+        public_ip = data["ip"]  # get public ip from json data
+        print("My Public IP: ", public_ip)
 
     except:
-        err_msg = "无法获取公网出口IP地址"     # 查询失败时输出提示信息
+        err_msg = "Can not get public internet."    
         print(err_msg)
         public_ip = ''
 

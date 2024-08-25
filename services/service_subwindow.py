@@ -96,19 +96,19 @@ if __name__ == '__main__':
     bl_space_type:
 
     <General>
-    VIEW_3D – 3D Viewport area
-    IMAGE_EDITOR – UV/Image Editor area
-    NODE_EDITOR – Node Editor area
-    SEQUENCE_EDITOR – Video Sequencer area
-    CLIP_EDITOR – Movie Clip Editor area
+    VIEW_3D - 3D Viewport area
+    IMAGE_EDITOR - UV/Image Editor area
+    NODE_EDITOR - Node Editor area
+    SEQUENCE_EDITOR - Video Sequencer area
+    CLIP_EDITOR - Movie Clip Editor area
 
     <Animation>
-    DOPESHEET_EDITOR – Dope Sheet area
-    GRAPH_EDITOR – Graph Editor area
-    NLA_EDITOR – Nonlinear Animation area
+    DOPESHEET_EDITOR - Dope Sheet area
+    GRAPH_EDITOR - Graph Editor area
+    NLA_EDITOR - Nonlinear Animation area
 
     <Scripting>
-    TEXT_EDITOR – Text Editor area
+    TEXT_EDITOR - Text Editor area
     INFO
     CONSOLE
     TOPBAR
@@ -116,9 +116,9 @@ if __name__ == '__main__':
 
     <data>
     OUTLINER
-    PROPERTIES – Properties area
-    FILE_BROWSER – File Browser area
-    SPREADSHEET – Spreadsheet area
+    PROPERTIES - Properties area
+    FILE_BROWSER - File Browser area
+    SPREADSHEET - Spreadsheet area
     PREFERENCES
     '''
 #    img = bpy.data.images.load(img_path)

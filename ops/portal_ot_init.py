@@ -1,4 +1,5 @@
 import bpy
+from ..services.service_previews import previews
 
 
 class PORTAL_OT_init(bpy.types.Operator):
@@ -12,6 +13,13 @@ class PORTAL_OT_init(bpy.types.Operator):
         return True
 
     def execute(self, ctx):
+        ## clear up the previews
+        # for pcoll in previews:
+        #     if type(pcoll) is bpy.types.ImagePreview:
+        #         bpy.utils.previews.remove(pcoll)
+        # previews.clear()
+        
+
         self.try_guest(ctx)
         # self.try_rpyc(ctx)
         

@@ -10,7 +10,7 @@ from multiprocessing.dummy import Pool as ThreadPool
 from .. import settings
 
 def parse_image_from_text_re(html):
-
+    '''parse html and lookup for img element'''
     img_list = []
     settings.portal_sku_detail_image_dict = {}
     i = 0
@@ -20,13 +20,18 @@ def parse_image_from_text_re(html):
         img_url = settings.portal_domain + key
         print(img_url)
         img_list.append(img_url)
+
+        ## Plan B:
+        ## return dict obj by global variable
         img_name = os.path.basename(img_url) 
         img = {
             'url' : img_url,
             'name' : img_name,
-        }
+        }        
         settings.portal_sku_detail_image_dict[str(i)] = img
+        
         i = i + 1
+    ## return list obj by direct returning
     return img_list
 
 def getpicurl(url):
@@ -60,30 +65,30 @@ def open_url(url):
 def parse_image_from_text(html_text):
     # html_text = html_text.encode('utf-8')
     print("parsing html text:", html_text)
-    # [^"]+\.jpg 匹配除"以外的所有字符多次,后面跟上转义的.和png
+    # [^"]+\.jpg filter any but ", concatenate with '.jpg', '.'should be excaped 
     # p = r'(http.:[\S]*?.(jpg|jpeg|png|gif|bmp|webp))'
     # p = '\/\(\?<=\(img\[\^>\]\*src="\)\)\[\^"\]\*\/g'
     # p = r'/<img[^>]+src=\"?([^\"\\s]+)\"?[^>]*>/g'
     p = '\/<img\[\^>\]\+src=\\"\?\(\[\^\\"\\\\s\]\+\)\\"\?\[\^>\]\*>\/g'
 
-    # 返回正则表达式在字符串中所有匹配结果的列表
+    # match result retrived in list
     imglist = re.findall(p, html_text)
     print("List of Img: " + str(imglist))
     return imglist
 
 def get_img(imglist):
-    # 循环遍历列表的每一个值
     for img in imglist:
-        # 以/为分隔符，-1返回最后一个值
+        # '-1' return the last one of splited items, which will be the name.
         filename = img[0].split("/")[-1]
-        # 访问each，并将页面的二进制数据赋值给photo
+        
+        # read bytes of image
         photo = urllib.request.urlopen(img[0])
         w = photo.read()
-        # 打开指定文件，并允许写入二进制数据
+        
+        # write bytes to file
         f = open('D:/test/' + filename, 'wb')
-        # 写入获取的数据
         f.write(w)
-        # 关闭文件
+
         f.close()
         print(filename + " have been download...")
  
@@ -130,10 +135,9 @@ def parse_image_from_file():
 
 
 
-# 该模块既可以导入到别的模块中使用，另外该模块也可自我执行
+
 if __name__ == '__main__':
-    # 定义url
+
     url = "https://movie.douban.com/top250"
-    # 将url作为open_url()的参数，然后将open_url()的返回值作为参数赋给get_img()
     get_img(parse_img_path(open_url(url)))
     print("all over...")

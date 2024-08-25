@@ -74,7 +74,7 @@ def class_factory_ops_install_mod(mod_name):
         open_bpy_console_if_not()
         subprocess.call([python_exe, '-m', 'ensurepip', '--upgrade'])
         subprocess.call([python_exe, '-m', 'pip', 'install', '--upgrade', 'pip'])
-        subprocess.call([python_exe, '-m', 'pip', 'install', f'{mod_name}'])
+        subprocess.call([python_exe, '-m', 'pip', 'install', '--quiet', f'{mod_name}'])
         return {"FINISHED"}
     def invoke(self, context, event):
         return self.execute(context)
@@ -111,7 +111,7 @@ def class_factory_ops_uninstall_mod(mod_name):
         open_bpy_console_if_not()
         subprocess.call([python_exe, '-m', 'ensurepip', '--upgrade'])
         subprocess.call([python_exe, '-m', 'pip', 'install', '--upgrade', 'pip'])
-        subprocess.call([python_exe, '-m', 'pip', 'uninstall', f'{mod_name}'])
+        subprocess.call([python_exe, '-m', 'pip', 'uninstall', '--yes', f'{mod_name}'])
         return {"FINISHED"}
     def invoke(self, context, event):
         return self.execute(context)
@@ -176,6 +176,9 @@ PORTAL_OT_uninstall_rpyc = class_factory_ops_uninstall_mod('rpyc')
 
 PORTAL_OT_install_requests = class_factory_ops_install_mod('requests')
 PORTAL_OT_uninstall_requests = class_factory_ops_uninstall_mod('requests')
+
+PORTAL_OT_install_pywebview = class_factory_ops_install_mod('pywebview')
+PORTAL_OT_uninstall_pywebview = class_factory_ops_uninstall_mod('pywebview')
 ##++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 class ExampleAddonPreferences(bpy.types.AddonPreferences):
     # this must match the add-on name, use '__package__'
@@ -247,13 +250,16 @@ class ExampleAddonPreferences(bpy.types.AddonPreferences):
     def draw(self, ctx):
         RPyC_installed = is_installed('rpyc')  ## is_installed('win32api') and is_installed('win32gui') and is_installed('win32con')
         REQUESTS_installed = is_installed('requests')
+        PYWEBVIEW_installed = is_installed('webview')
 
         layout = self.layout        
         row = layout.row()
 
         layout.prop(self, 'is_show_dependencies', toggle=1)
         if self.is_show_dependencies:
-            depend_box = layout.box()            
+            depend_box = layout.box()   
+
+            ## mod1: rpyc         
             row_1 = depend_box.row()
             col_install = row_1.column()        
             col_install.enabled = not RPyC_installed
@@ -261,6 +267,8 @@ class ExampleAddonPreferences(bpy.types.AddonPreferences):
             col_uninstall = row_1.column()
             col_uninstall.enabled = RPyC_installed
             op_uninstall_mod = col_uninstall.operator(PORTAL_OT_uninstall_rpyc.bl_idname, text=ptext('remove RPyC'), icon_value=19, emboss=RPyC_installed, depress=RPyC_installed)
+            
+            ## mod2: requests
             row_2 = depend_box.row()
             col_install = row_2.column()
             col_install.enabled = not REQUESTS_installed
@@ -268,6 +276,16 @@ class ExampleAddonPreferences(bpy.types.AddonPreferences):
             col_uninstall = row_2.column()
             col_uninstall.enabled = REQUESTS_installed
             op_uninstall_mod = col_uninstall.operator(PORTAL_OT_uninstall_requests.bl_idname, text=ptext('remove Requests'), icon_value=19, emboss=REQUESTS_installed, depress=REQUESTS_installed)
+
+            ## mod3: pywebview         
+            row_3 = depend_box.row()
+            col_install = row_3.column()        
+            col_install.enabled = not PYWEBVIEW_installed
+            op_install_mod = col_install.operator(PORTAL_OT_install_pywebview.bl_idname, text=ptext('Install pywebview'), icon_value=36, emboss=not PYWEBVIEW_installed, depress=not PYWEBVIEW_installed)
+            col_uninstall = row_3.column()
+            col_uninstall.enabled = PYWEBVIEW_installed
+            op_uninstall_mod = col_uninstall.operator(PORTAL_OT_uninstall_pywebview.bl_idname, text=ptext('remove pywebview'), icon_value=19, emboss=PYWEBVIEW_installed, depress=PYWEBVIEW_installed)
+
 
         layout.separator()
         
@@ -350,6 +368,8 @@ classes = [
     PORTAL_OT_uninstall_rpyc,
     PORTAL_OT_install_requests,
     PORTAL_OT_uninstall_requests,
+    PORTAL_OT_install_pywebview,
+    PORTAL_OT_uninstall_pywebview,
     ExampleAddonPreferences,
 ]
 
