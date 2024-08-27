@@ -97,15 +97,37 @@ class PORTAL_PT_main_panel(bpy.types.Panel):
             row_droplist = layout.row()
             row_droplist.prop(ctx.scene, "portal_sku_user_previews")
 
-        row_current = layout.row()
-        
-        col_current_summary = row_current.column()
+        row_current_images = layout.row()
+
+        # if len(ctx.scene.portal_sku_detail_previews) > 0: ## Error: current value '0' matches no enum in 'Scene', 'Scene', 'portal_sku_detail_previews'
+        row_preview = row_current_images.row()            
+        row_preview.template_icon_view(
+            ctx.scene, 
+            "portal_sku_detail_previews",
+            show_labels=True,
+            scale=6.0, 
+            scale_popup=5.0,
+        )
+
+        grid = layout.grid_flow(columns=5, even_columns=True, even_rows=False)
+        grid.scale_y = 3
+        pcoll = service_previews.previews['global']
+        for i,name in enumerate(pcoll):
+            cell = grid.column().box()
+            cell.template_icon(icon_value=pcoll[name].icon_id, scale=1)
+            cell.label(text=name)
+            cell.label(text=str(pcoll[name].icon_id))
+            o = cell.operator("render.render")
+
+        ## detail webpage content showed with webview   
+        row_current_detail = layout.row() 
+        col_current_summary = row_current_detail.column()
         col_current_summary.operator('portal.show_detail')  ## operator('vp.popup_confirm')
         
         ## active addon has 2 different functions to switch in realtime, to open website or to exec current addon.
         ## depend on the global variable of 'scn.portal_active_addon_status'
         ## this variable will be change by 'portal_ot_tab' & 'service_preview'
-        col_current_open = row_current.column()
+        col_current_open = row_current_detail.column()
         col_current_open.operator('portal.open_active_addon', text=ptext(scn.portal_active_addon_status))
 
         ## test: UI Condition
@@ -118,33 +140,14 @@ class PORTAL_PT_main_panel(bpy.types.Panel):
             # opt_cn = row_btn.operator('portal.build_rig')
 
         
-        # if len(ctx.scene.portal_sku_detail_previews) > 0: ## Error: current value '0' matches no enum in 'Scene', 'Scene', 'portal_sku_detail_previews'
-            
-        row_preview = layout.row()            
-        row_preview.template_icon_view(
-            ctx.scene, 
-            "portal_sku_detail_previews",
-            show_labels=True,
-            scale=6.0, 
-            scale_popup=5.0,
-        )
-
-
-
-        grid = layout.grid_flow(columns=5, even_columns=True, even_rows=False)
-        grid.scale_y = 3
-        pcoll = service_previews.previews['global']
-        for i,name in enumerate(pcoll):
-            cell = grid.column().box()
-            cell.template_icon(icon_value=pcoll[name].icon_id, scale=1)
-            cell.label(text=name)
-            cell.label(text=str(pcoll[name].icon_id))
-            o = cell.operator("render.render")
-
-        addon_updater_ops.update_notice_box_ui(self, ctx)
+        
 
         row_test = layout.row()
         row_test.operator("tele.test_lib")
+
+        addon_updater_ops.update_notice_box_ui(self, ctx)
+
+        
 
         
 

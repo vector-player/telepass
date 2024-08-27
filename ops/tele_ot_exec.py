@@ -9,7 +9,7 @@ class TELE_OT_exec(bpy.types.Operator):
     Use Case: bpy.ops.tele.exec(ref='init')
     """
     bl_idname = "tele.exec"
-    bl_label = "tele.exec"
+    bl_label = "" # "tele.exec"
     bl_description = "Execute function of cloud addon"
     bl_options = {"REGISTER"}
 
@@ -62,7 +62,8 @@ class TELE_OT_exec(bpy.types.Operator):
         
         else:
         
-            try:          
+            try:    
+                logger.debug("{}: try execute below codes:{}".format(__class__.__name__, res['code']))      
                 exec(res['code'])
             except Exception as e:                
                 bpy.ops.tele.msgbox('INVOKE_DEFAULT',msg="Error: " + str(e))

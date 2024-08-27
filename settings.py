@@ -1,6 +1,8 @@
 import os
-import bpy
 import requests
+
+ORIG_SYS_PATH = []
+BPY_SYS_PATH = []
 # addon_name = os.path.basename(os.path.dirname(os.path.realpath(__file__)))
 # root_path = os.path.dirname(os.path.abspath(os.path.realpath(__file__)))
 # img_dir = os.path.join(root_path,'images')

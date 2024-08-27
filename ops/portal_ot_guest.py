@@ -34,8 +34,8 @@ class PORTAL_OT_guest(bpy.types.Operator):
         try:
             # res = http.request("GET", url)
             res = sss.get(url, headers = my_headers)
-            logger.debug("market link response:+++++++++++++++++++++++++++++++++\n{}".format(res))
-            logger.debug("Response status code:{}".format(res.status_code))
+            logger.debug("\nmarket link response:+++++++++++++++++++++++++++++++++\n{}".format(res))
+            # logger.debug("Response status code:{}".format(res.status_code))
             # print("Response headers:",res.headers)
             # print(res.body.decode('utf-8'))
             if res.status_code >= 200 and res.status_code < 300:
@@ -52,7 +52,21 @@ class PORTAL_OT_guest(bpy.types.Operator):
             self.report({'INFO'}, e)
             logger.debug("Error while handling json.loads: \n")
             return False
-        logger.debug("market link response:+++++++++++++++++++++++++++++++++\n{}".format(res))
+        # logger.debug("market link response:+++++++++++++++++++++++++++++++++\n{}".format(res))
+        
+        # logger.debug("market link response:+++++++++++++++++++++++++++++++++\n")
+        # if type(res) == list:            
+        #     for i in res:                
+        #         if type(i) == dict:
+        #             print("{")
+        #             for key,value in i.items():
+        #                 print(f"    {key}:{value},")
+        #             print("},")
+        #         else:
+        #             logger.debug("{}".format(i))
+        # else:
+        #     logger.debug("{}".format(res))
+
         # print('session:',res['session_id'])
         return res
 
@@ -79,7 +93,7 @@ class PORTAL_OT_guest(bpy.types.Operator):
         # code_names = self.parse_purchased_codenames(spus)
         # ctx.scene.user_addon_names = self.parse_user_spus(spus, 'title')        
         settings.portal_market_addons = SKU_SPU_Serializer(api_market_sku_spus)
-        logger.debug("LOGIN INFO:portal_market_addons found:{}".format(settings.portal_market_addons))
+        # logger.debug("LOGIN INFO:portal_market_addons found:{}".format(settings.portal_market_addons))
         # load_previews_market_sku(ctx.scene.portal_sku_market_previews, ctx)
         ## Cause WARNING
         # WARN (bpy.rna): C:\Users\blender\git\blender-vdev\blender.git\source\blender\python\intern\bpy_rna.c:1340 pyrna_enum_to_py: current value '0' matches no enum in 'Scene', 'Scene', 'portal_sku_market_previews'

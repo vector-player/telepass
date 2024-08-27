@@ -15,6 +15,7 @@ class PORTAL_OT_open_active_addon(bpy.types.Operator):
         if ctx.scene.portal_tab == 'market':
             import webbrowser
             id = ctx.scene.portal_active_market_addon_id
+            
             print('id:',id)
             if id == '':
                 msg = 'Please select an item first.'
@@ -27,13 +28,15 @@ class PORTAL_OT_open_active_addon(bpy.types.Operator):
                 self.report({'INFO'}, msg)
                 print(msg)
                 return {"FINISHED"}
-
-            if settings.portal_market_addons[id].status == 'test':                
+            
+            sku = settings.portal_market_addons[id]
+            if sku.status == 'test':                
                 bpy.ops.tele.exec(ref='init')
                 return {"FINISHED"}
 
+            spu_id = sku.spu.id
             # url = f"http://192.168.1.203:8000/spu/{id}/"
-            url = f"{settings.portal_spu}/{id}/"
+            url = f"{settings.portal_spu}/{spu_id}/"
             webbrowser.open(url)
         if ctx.scene.portal_tab == 'my':
             # ctx.scene.portal_sku_user_previews = str(1)

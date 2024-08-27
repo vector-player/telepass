@@ -3,13 +3,13 @@ global GLOBALS_DICT
 GLOBALS_DICT = {}
 
 def _init():
-    """在主模块初始化"""
+    """init"""
     # global GLOBALS_DICT
     GLOBALS_DICT = {}
  
  
 def set(name, value):
-    """设置"""
+    """set"""
     try:
         GLOBALS_DICT[name] = value
         return True
@@ -18,7 +18,7 @@ def set(name, value):
  
  
 def get(name):
-    """取值"""
+    """get"""
     try:
         return GLOBALS_DICT[name]
     except KeyError:

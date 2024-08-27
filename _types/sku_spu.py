@@ -90,7 +90,7 @@ def SKU_SPU_Serializer(api_sku_spus):
         portal_sku_spu.specs = api['specs']
 
         PORTAL_SKU_SPUS[str(portal_sku_spu.id)] = portal_sku_spu
-        logger.debug("SKU count:".format(len(PORTAL_SKU_SPUS)))
+        # logger.debug("SKU count:{}".format(len(PORTAL_SKU_SPUS)))
         
     return PORTAL_SKU_SPUS
     

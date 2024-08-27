@@ -156,8 +156,8 @@ def load_image_list(self, ctx):
         # img_name = os.path.basename(img_url) 
         # img_url = img['url'] 
         img_name = get_img_name_from_url(img_url)
-        print("load_image_list:img_url:",img_url)
-        print("load_image_list:img_name:",img_name)
+        # print("load_image_list:img_url:",img_url)
+        # print("load_image_list:img_name:",img_name)
         
         
 
@@ -178,7 +178,7 @@ def load_image_list(self, ctx):
         ## Format thumb to Enumerator to feed UI
         enum_items.append((str(i), img_name, img_url, thumb.icon_id, i))
 
-    print("load_image_list: market enum_items:",len(enum_items))
+    # print("load_image_list: market enum_items:",len(enum_items))
     bpy.context.view_layer.update()
     bpy.context.area.tag_redraw()
     # bpy.utils.previews.remove(pcoll) # try to eliminate WARNING of 'previews left open'

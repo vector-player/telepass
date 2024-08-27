@@ -245,7 +245,7 @@ class rpyc_tool:
             import os
             return os.getcwd()
         
-        def exposed_move(self):
+        def exposed_example_move(self):
             import bpy
             # bpy.context.object.data.vertices[0].co.y=20
             bpy.context.view_layer.objects.active.data.vertices[0].co.y=20

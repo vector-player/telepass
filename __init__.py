@@ -12,13 +12,17 @@ bl_info = {
 
 
 
-# import sys
-import os
-# sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-# sys.path.append(os.path.abspath('.views')) 
-import logging
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s【%(levelname)s】(%(name)s-No.%(lineno)d):%(funcName)s -> %(message)s")
-logger = logging.getLogger(__name__)
+from . import settings
+import multiprocessing
+import sys
+settings.ORIG_SYS_PATH = list(sys.path) # Make a new instance of sys.path, use this path for python module that messed up with bpy(such as 'multiprocessing') 
+# print("\nsys.path:","\n".join(sys.path),"\n")
+import bpy # Here, the sys.path is severely messed with, screws up the import 
+           # in the new process that is created in multiprocessing.Pool()
+settings.BPY_SYS_PATH = list(sys.path) # Make instance of `bpy`'s modified sys.path
+
+
+
 import bpy
 from . import addon_updater_ops
 from . import settings
@@ -43,6 +47,10 @@ from .ops import (
 from .services import service_previews
 from .services.service_previews import previews
 from .lib.test import TELE_OT_test_lib
+
+import logging
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s【%(levelname)s】(%(name)s-No.%(lineno)d):%(funcName)s -> %(message)s")
+logger = logging.getLogger(__name__)
 
 # print("cwd:",os.getcwd())
 
